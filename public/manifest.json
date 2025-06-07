@@ -1,0 +1,23 @@
+{
+  "name": "My Side Panel Extension",
+  "description": "테스트 1",
+  "version": "1.0",
+  "manifest_version": 3,
+
+  "permissions": ["sidePanel"],
+
+  "host_permissions": ["<all_urls>"],
+
+  "action": {
+    "default_title": "Open Side Panel"
+  },
+
+  "background": {
+    "service_worker": "background/background.js",
+    "type": "module"
+  },
+
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  }
+}

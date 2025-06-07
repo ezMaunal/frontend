@@ -1,0 +1,36 @@
+# 로그 파일
+logs
+*.log
+npm-debug.log*
+
+# 시스템 파일
+.DS_Store
+*.sw?
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# IDE 설정
+.vscode/
+!.vscode/extensions.json
+.idea/
+
+# 환경 파일
+.env
+.env.*
+**/.env
+**/.env.*
+
+# 빌드 결과물
+dist/
+dist-ssr/
+build/
+**/dist/
+**/build/
+**/dist-zip/
+**/tailwind-output.css
+
+# 패키지 매니저
+node_modules/
+**/node_modules/
