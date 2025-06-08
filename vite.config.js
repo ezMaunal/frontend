@@ -16,7 +16,7 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: path.resolve(__dirname, "src/background/background.js"),
+          src: "src/background/background.js",
           dest: "background",
         },
       ],
