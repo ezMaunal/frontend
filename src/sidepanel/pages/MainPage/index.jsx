@@ -1,6 +1,18 @@
 import "@/styles/styles.css";
+import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
+  const navigate = useNavigate();
+
+  const handleStartClick = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tabId = tabs[0]?.id;
+      if (tabId) {
+        chrome.scripting.executeScript({ files: ["captureOverlay.js"], target: { tabId } });
+        navigate("/taskboard");
+      }
+    });
+  };
   return (
     <div className="flex min-h-screen flex-col items-center justify-between bg-white pt-10 pb-12">
       <div className="flex w-full max-w-md flex-row justify-center gap-x-4 px-4">
@@ -14,7 +26,10 @@ const MainPage = () => {
       </div>
 
       <div className="flex flex-col items-center space-y-4">
-        <button className="mb-4 cursor-pointer items-center rounded-2xl bg-orange-500 px-10 py-4 text-white hover:bg-orange-600">
+        <button
+          className="mb-4 cursor-pointer items-center rounded-2xl bg-orange-500 px-10 py-4 text-white hover:bg-orange-600"
+          onClick={() => handleStartClick()}
+        >
           <p className="mb-1 text-xl">매뉴얼 만들기</p>
           <p className="w-48 text-center text-2xl font-bold">START</p>
         </button>

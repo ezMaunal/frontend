@@ -4,7 +4,7 @@
   "version": "1.0",
   "manifest_version": 3,
 
-  "permissions": ["sidePanel"],
+  "permissions": ["sidePanel","scripting", "activeTab"],
 
   "host_permissions": ["<all_urls>"],
 
@@ -19,5 +19,13 @@
 
   "side_panel": {
     "default_path": "src/sidepanel/index.html"
-  }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["captureOverlay.js"],
+      "run_at": "document_idle"
+    }
+  ]
 }
