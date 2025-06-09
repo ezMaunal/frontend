@@ -17,7 +17,12 @@ const MainPage = () => {
     <div className="flex min-h-screen flex-col items-center justify-between bg-white pt-10 pb-12">
       <div className="flex w-full max-w-md flex-row justify-center gap-x-4 px-4">
         <button className="btn-orange">저장소</button>
-        <button className="btn-orange">설정</button>
+        <button
+          className="btn-orange"
+          onClick={() => navigate("/settings")}
+        >
+          설정
+        </button>
       </div>
 
       <div className="mt-16 w-full max-w-md px-4 text-center">
