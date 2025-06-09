@@ -19,6 +19,10 @@ export default defineConfig({
           src: "src/background/background.js",
           dest: "background",
         },
+        {
+          src: "src/content/captureOverlay.js",
+          dest: ".",
+        },
       ],
     }),
   ],
