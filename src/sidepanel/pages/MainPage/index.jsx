@@ -5,13 +5,7 @@ const MainPage = () => {
   const navigate = useNavigate();
 
   const handleStartClick = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const tabId = tabs[0]?.id;
-      if (tabId) {
-        chrome.scripting.executeScript({ files: ["captureOverlay.js"], target: { tabId } });
-        navigate("/taskboard");
-      }
-    });
+    navigate("/taskboard");
   };
   return (
     <div className="flex min-h-screen flex-col items-center justify-between bg-white pt-10 pb-12">
