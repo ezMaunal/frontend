@@ -30,10 +30,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.error("Capture error:", chrome.runtime.lastError);
         return;
       }
-
       chrome.runtime.sendMessage({
         type: "CAPTURED_IMAGE",
         image: dataUrl,
+        elementData: message.elementData,
       });
     });
   }

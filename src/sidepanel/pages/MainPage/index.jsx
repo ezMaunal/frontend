@@ -8,7 +8,7 @@ const MainPage = () => {
     navigate("/taskboard");
   };
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between bg-white pt-10 pb-12">
+    <div className="main-container">
       <div className="flex w-full max-w-md flex-row justify-center gap-x-4 px-4">
         <button className="btn-orange">저장소</button>
         <button
