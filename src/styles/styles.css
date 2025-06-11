@@ -3,3 +3,9 @@
 .btn-orange {
   @apply w-1/2 cursor-pointer rounded-2xl bg-orange-500 px-5 py-3 text-center text-lg font-bold text-white shadow hover:bg-orange-600;
 }
+.main-container {
+  @apply flex min-h-screen flex-col items-center justify-between bg-white pt-10 pb-12;
+}
+.recording-overlay {
+  @apply fixed top-0 left-0 z-[999999] flex h-screen w-screen items-center justify-center bg-black/70 text-2xl text-white;
+}
