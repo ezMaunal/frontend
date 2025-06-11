@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 const TaskBoard = () => {
   const [images, setImages] = useState([]);
+  const [elementData, setElementData] = useState([]);
 
   useEffect(() => {
     chrome.runtime.sendMessage({ type: "START_CAPTURE" }, () => {
@@ -14,6 +15,7 @@ const TaskBoard = () => {
     const handleMessage = (message) => {
       if (message.type === "CAPTURED_IMAGE") {
         setImages((prev) => [...prev, message.image]);
+        setElementData((prev) => [...prev, message.elementData]);
       }
     };
 
@@ -46,6 +48,11 @@ const TaskBoard = () => {
                 src={image}
                 className="max-h-full max-w-full object-contain"
               />
+            </div>
+            <div>
+              <div>태그 이름: {elementData[index].tagName}</div>
+              <div>요소 텍스트: {elementData[index].textContent}</div>
+              <div>rect 정보: {JSON.stringify(elementData[index].rect)}</div>
             </div>
             {index !== images.length - 1 && (
               <div className="flex justify-center text-2xl text-gray-400">↓</div>
