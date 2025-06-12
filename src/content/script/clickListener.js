@@ -24,30 +24,26 @@ window.addEventListener("mousedown", (event) => {
     tagName: target.tagName,
     textContent: target.textContent,
   };
-  chrome.runtime
-    .sendMessage({
-      type: "CLICKED",
-      elementData: targetElementInfo,
-    })
-    .then((res) => {
-      if (res.status === "captured") {
-        if (currentOverlay) {
-          currentOverlay.remove();
-          currentOverlay = null;
-        }
-        targetElementInfo = null;
-      } else {
-        console.warn("캡처 실패 또는 응답 이상:", res);
-      }
-    });
-});
 
-// window.addEventListener("mouseup", () => {
-//   setTimeout(() => {
-//     if (currentOverlay) {
-//       currentOverlay.remove();
-//       currentOverlay = null;
-//     }
-//     targetElementInfo = null;
-//   }, 300);
-// });
+  if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
+    setTimeout(() => {
+      chrome.runtime.sendMessage(
+        {
+          type: "CLICKED",
+          elementData: targetElementInfo,
+        },
+        (res) => {
+          if (res && res.status === "captured") {
+            if (currentOverlay) {
+              currentOverlay.remove();
+              currentOverlay = null;
+            }
+            targetElementInfo = null;
+          } else {
+            console.warn("캡처 실패:", res);
+          }
+        },
+      );
+    }, 100);
+  }
+});
