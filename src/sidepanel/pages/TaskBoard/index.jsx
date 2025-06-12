@@ -39,7 +39,13 @@ const TaskBoard = () => {
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
                   {index + 1}
                 </div>
-                <div className="font-bold">TEST TITLE ⋯</div>
+                <div>
+                  {elementData[index].textContent === "" ? (
+                    <div className="font-bold">"여기"를 클릭해주세요!!</div>
+                  ) : (
+                    <div className="font-bold">{`"${elementData[index].textContent.trim().substring(0, 13)}"을 클릭해주세요!!`}</div>
+                  )}
+                </div>
               </div>
               <button className="text-lg text-red-500">⋯</button>
             </div>
@@ -48,11 +54,6 @@ const TaskBoard = () => {
                 src={image}
                 className="max-h-full max-w-full object-contain"
               />
-            </div>
-            <div>
-              <div>태그 이름: {elementData[index].tagName}</div>
-              <div>요소 텍스트: {elementData[index].textContent}</div>
-              <div>rect 정보: {JSON.stringify(elementData[index].rect)}</div>
             </div>
             {index !== images.length - 1 && (
               <div className="flex justify-center text-2xl text-gray-400">↓</div>
