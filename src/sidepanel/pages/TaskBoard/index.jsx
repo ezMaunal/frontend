@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import TaskCard from "./TaskCard";
+
 const TaskBoard = () => {
   const [images, setImages] = useState([]);
   const [elementData, setElementData] = useState([]);
@@ -39,13 +41,14 @@ const TaskBoard = () => {
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
                   {index + 1}
                 </div>
-                <div>
-                  {elementData[index].textContent === "" ? (
-                    <div className="font-bold">"여기"를 클릭해주세요!!</div>
-                  ) : (
-                    <div className="font-bold">{`"${elementData[index].textContent.trim().substring(0, 13)}"을 클릭해주세요!!`}</div>
-                  )}
-                </div>
+                <TaskCard
+                  element={elementData[index]}
+                  onTitleChange={(newTitle) => {
+                    const updated = [...elementData];
+                    updated[index].textContent = newTitle;
+                    setElementData(updated);
+                  }}
+                />
               </div>
               <button className="text-lg text-red-500">⋯</button>
             </div>
