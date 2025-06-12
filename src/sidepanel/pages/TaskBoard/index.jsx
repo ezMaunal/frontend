@@ -42,7 +42,7 @@ const TaskBoard = () => {
 
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <div className="- flex justify-around bg-orange-500 py-4 text-white">
+      <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
           {isCapturing === true ? (
             <div className="flex items-center justify-center">
@@ -76,11 +76,11 @@ const TaskBoard = () => {
                     {index + 1}
                   </div>
                   <div>
-                    {elementData[index].textContent === "" ? (
-                      <div className="font-bold">"여기"를 클릭해주세요!!</div>
-                    ) : (
-                      <div className="font-bold">{`"${elementData[index].textContent.trim().substring(0, 13)}"을 클릭해주세요!!`}</div>
-                    )}
+                    <div className="font-bold">
+                      {elementData[index].textContent === ""
+                        ? `"여기"를 클릭해주세요!!`
+                        : `"${elementData[index].textContent.trim().substring(0, 13)}"을 클릭해주세요!!`}
+                    </div>
                   </div>
                 </div>
                 <button className="text-lg text-red-500">⋯</button>
@@ -100,15 +100,13 @@ const TaskBoard = () => {
       </div>
 
       <div>
-        {isCapturing === true ? (
-          <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center">
+          {isCapturing === true ? (
             <div className="ml-3 flex animate-pulse text-xl text-gray-400">캡쳐중...</div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center">
+          ) : (
             <div className="ml-3 flex text-xl text-gray-400">캡쳐 일시중단</div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="flex justify-around bg-orange-500 py-4 text-white">
@@ -119,27 +117,15 @@ const TaskBoard = () => {
           <span className="mt-1 text-sm">캡쳐완료</span>
         </div>
         <div>
-          {isCapturing === true ? (
-            <div className="flex flex-col items-center">
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
-                onClick={handlePauseClick}
-              >
-                ǁ
-              </div>
-              <span className="mt-1 text-sm">일시중지</span>
+          <div className="flex flex-col items-center">
+            <div
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
+              onClick={handlePauseClick}
+            >
+              {isCapturing ? "ǁ" : <div className="ml-[2px]">▶</div>}
             </div>
-          ) : (
-            <div className="flex flex-col items-center">
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
-                onClick={handlePauseClick}
-              >
-                <div className="ml-[2px]">▶</div>
-              </div>
-              <span className="mt-1 text-sm">캡쳐 계속진행</span>
-            </div>
-          )}
+            <span className="mt-1 text-sm">{isCapturing ? "일시중지" : "캡쳐 계속진행"}</span>
+          </div>
         </div>
         <div className="flex flex-col items-center">
           <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl">
