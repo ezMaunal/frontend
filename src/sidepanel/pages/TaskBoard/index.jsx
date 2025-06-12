@@ -2,6 +2,8 @@ import "@/styles/styles.css";
 
 import { useEffect, useState, useRef } from "react";
 
+import TaskCard from "./TaskCard";
+
 const TaskBoard = () => {
   const [images, setImages] = useState([]);
   const [elementData, setElementData] = useState([]);
@@ -40,7 +42,7 @@ const TaskBoard = () => {
     isCapturingRef.current = isCapturing;
   }, [isCapturing]);
 
-  return (
+ return (
     <div className="flex min-h-screen w-full flex-col">
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
@@ -48,6 +50,41 @@ const TaskBoard = () => {
             <div className="flex items-center justify-center">
               <div className="flex h-12 w-12 items-center justify-center bg-white">
                 <div className="flex h-6 w-6 animate-pulse rounded-full bg-orange-500" />
+              </div>
+              <div className="ml-3 flex animate-pulse text-3xl text-white">캡쳐중...</div>
+            </div>
+          ) : (
+            <div>
+              <div className="ml-3 flex text-3xl text-white">캡쳐 일시중단</div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex-1 px-4 py-6">
+        {images.length === 0 ? (
+          <div className="flex h-full items-center justify-center text-xl text-gray-400">
+            캡쳐된 내용이 없습니다.
+          </div>
+        ) : (
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className="space-y-2"
+          >
+            <div className="flex items-center justify-between rounded-md bg-gray-200 px-3 py-2">
+              <div className="flex items-center space-x-2">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
+                  {index + 1}
+                </div>
+                <TaskCard
+                  element={elementData[index]}
+                  onTitleChange={(newTitle) => {
+                    const updated = [...elementData];
+                    updated[index].textContent = newTitle;
+                    setElementData(updated);
+                  }}
+                />
               </div>
               <div className="ml-3 flex animate-pulse text-3xl text-white">캡쳐중...</div>
             </div>
