@@ -4,37 +4,35 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "START_CAPTURE") {
-    chrome.tabs.query({}, (tabs) => {
-      tabs.forEach((tab) => {
-        if (tab.id) {
-          chrome.scripting.insertCSS({
-            target: { tabId: tab.id },
-            files: ["style/style.css"],
-          });
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs[0];
 
-          chrome.scripting.executeScript({
+      chrome.scripting
+        .insertCSS({
+          target: { tabId: tab.id },
+          files: ["style/style.css"],
+        })
+        .then(() => {
+          return chrome.scripting.executeScript({
             target: { tabId: tab.id },
-            files: ["captureOverlay.js"],
+            files: ["content/showCaptureStartMessage.js"],
           });
-        }
-      });
-
-      sendResponse({ status: "content scripts injected to all tabs" });
+        });
     });
+
     return true;
   }
 
   if (message.type === "CLICKED") {
     chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
-      if (chrome.runtime.lastError) {
-        console.error("Capture error:", chrome.runtime.lastError);
-        return;
-      }
       chrome.runtime.sendMessage({
         type: "CAPTURED_IMAGE",
         image: dataUrl,
         elementData: message.elementData,
       });
+
+      sendResponse({ status: "captured" });
     });
+    return true;
   }
 });

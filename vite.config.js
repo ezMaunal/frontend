@@ -23,6 +23,10 @@ export default defineConfig({
           src: "src/content/style/style.css",
           dest: "style",
         },
+        {
+          src: "src/content/script/*",
+          dest: "content",
+        },
       ],
     }),
   ],
@@ -35,15 +39,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         sidepanel: path.resolve(__dirname, "src/sidepanel/index.html"),
-        captureOverlay: path.resolve(__dirname, "src/content/captureOverlay.js"),
-      },
-      output: {
-        entryFileNames: (chunk) => {
-          if (chunk.name === "captureOverlay") {
-            return "captureOverlay.js";
-          }
-          return "assets/[name]-[hash].js";
-        },
       },
     },
     outDir: "dist",
