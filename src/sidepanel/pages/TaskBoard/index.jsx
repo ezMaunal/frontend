@@ -39,6 +39,10 @@ const TaskBoard = () => {
     isCapturingRef.current = isCapturing;
   }, [isCapturing]);
 
+  const handleDeleteStep = (index) => {
+    console.log("DELETED INDEX: " + index);
+  };
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       <div className="flex justify-around bg-orange-500 py-4 text-white">
@@ -71,6 +75,7 @@ const TaskBoard = () => {
                 index={index}
                 element={elementData[index]}
                 image={image}
+                onDeleteStep={() => handleDeleteStep(index)}
                 onTitleChange={(newTitle) => {
                   const updated = [...elementData];
                   updated[index].textContent = newTitle;
