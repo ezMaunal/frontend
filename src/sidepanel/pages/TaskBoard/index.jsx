@@ -1,5 +1,4 @@
 import "@/styles/styles.css";
-
 import { useEffect, useState, useRef } from "react";
 
 import TaskCard from "./TaskCard";
@@ -12,8 +11,7 @@ const TaskBoard = () => {
   const isCapturingRef = useRef(isCapturing);
 
   const handlePauseClick = () => {
-    console.log(isCapturing);
-    isCapturing === true ? setIsCapturing(false) : setIsCapturing(true);
+    setIsCapturing((prev) => !prev);
   };
 
   useEffect(() => {
@@ -32,7 +30,6 @@ const TaskBoard = () => {
     };
 
     chrome.runtime.onMessage.addListener(handleMessage);
-
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
     };
@@ -43,10 +40,10 @@ const TaskBoard = () => {
   }, [isCapturing]);
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
+    <div className="flex min-h-screen w-full flex-col bg-white">
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
-          {isCapturing === true ? (
+          {isCapturing ? (
             <div className="flex items-center justify-center">
               <div className="flex h-12 w-12 items-center justify-center bg-white">
                 <div className="flex h-6 w-6 animate-pulse rounded-full bg-orange-500" />
@@ -54,14 +51,12 @@ const TaskBoard = () => {
               <div className="ml-3 flex animate-pulse text-3xl text-white">캡쳐중...</div>
             </div>
           ) : (
-            <div>
-              <div className="ml-3 flex text-3xl text-white">캡쳐 일시중단</div>
-            </div>
+            <div className="ml-3 flex text-3xl text-white">캡쳐 일시중단</div>
           )}
         </div>
       </div>
 
-      <div className="flex-1 px-4 py-6">
+      <div className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
         {images.length === 0 ? (
           <div className="flex h-full items-center justify-center text-xl text-gray-400">
             캡쳐된 내용이 없습니다.
@@ -72,49 +67,23 @@ const TaskBoard = () => {
               key={index}
               className="space-y-2"
             >
-              <div className="flex items-center justify-between rounded-md bg-gray-200 px-3 py-2">
-                <div className="flex items-center space-x-2">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
-                    {index + 1}
-                  </div>
-
-                  <TaskCard
-                    element={elementData[index]}
-                    onTitleChange={(newTitle) => {
-                      const updated = [...elementData];
-                      updated[index].textContent = newTitle;
-                      setElementData(updated);
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="flex h-32 items-center justify-center rounded-md bg-gray-300 text-gray-600">
-                <img
-                  src={image}
-                  alt=""
-                  className="max-h-full max-w-full object-contain"
-                />
-              </div>
-
+              <TaskCard
+                index={index}
+                element={elementData[index]}
+                image={image}
+                onTitleChange={(newTitle) => {
+                  const updated = [...elementData];
+                  updated[index].textContent = newTitle;
+                  setElementData(updated);
+                }}
+              />
               {index !== images.length - 1 && (
                 <div className="flex justify-center text-2xl text-gray-400">↓</div>
               )}
             </div>
           ))
         )}
-
-        {isCapturing === true ? (
-          <div>
-            <div className="ml-3 flex animate-pulse text-3xl text-white">캡쳐중...</div>
-          </div>
-        ) : (
-          <div>
-            <div className="ml-3 flex text-3xl text-white">캡쳐 일시중단</div>
-          </div>
-        )}
       </div>
-      <div />
 
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
@@ -123,17 +92,17 @@ const TaskBoard = () => {
           </div>
           <span className="mt-1 text-sm">캡쳐완료</span>
         </div>
-        <div>
-          <div className="flex flex-col items-center">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
-              onClick={handlePauseClick}
-            >
-              {isCapturing ? "ǁ" : <div className="ml-[2px]">▶</div>}
-            </div>
-            <span className="mt-1 text-sm">{isCapturing ? "일시중지" : "캡쳐 계속진행"}</span>
+
+        <div className="flex flex-col items-center">
+          <div
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
+            onClick={handlePauseClick}
+          >
+            {isCapturing ? "ǁ" : <div className="ml-[2px]">▶</div>}
           </div>
+          <span className="mt-1 text-sm">{isCapturing ? "일시중지" : "캡쳐 계속진행"}</span>
         </div>
+
         <div className="flex flex-col items-center">
           <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl">
             ✕
