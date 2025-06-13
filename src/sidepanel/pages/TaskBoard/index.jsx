@@ -42,7 +42,7 @@ const TaskBoard = () => {
     isCapturingRef.current = isCapturing;
   }, [isCapturing]);
 
- return (
+  return (
     <div className="flex min-h-screen w-full flex-col">
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
@@ -67,84 +67,57 @@ const TaskBoard = () => {
             캡쳐된 내용이 없습니다.
           </div>
         ) : (
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className="space-y-2"
-          >
-            <div className="flex items-center justify-between rounded-md bg-gray-200 px-3 py-2">
-              <div className="flex items-center space-x-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
-                  {index + 1}
-                </div>
-                <TaskCard
-                  element={elementData[index]}
-                  onTitleChange={(newTitle) => {
-                    const updated = [...elementData];
-                    updated[index].textContent = newTitle;
-                    setElementData(updated);
-                  }}
-                />
-              </div>
-              <div className="ml-3 flex animate-pulse text-3xl text-white">캡쳐중...</div>
-            </div>
-          ) : (
-            <div>
-              <div className="ml-3 flex text-3xl text-white">캡쳐 일시중단</div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="flex-1 px-4 py-6">
-        {images.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-xl text-gray-400">
-            캡쳐된 내용이 없습니다.
-          </div>
-        ) : (
           images.map((image, index) => (
-            <div
-              key={index}
-              className="space-y-2"
-            >
-              <div className="flex items-center justify-between rounded-md bg-gray-200 px-3 py-2">
-                <div className="flex items-center space-x-2">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <div className="font-bold">
-                      {elementData[index].textContent === ""
-                        ? `"여기"를 클릭해주세요!!`
-                        : `"${elementData[index].textContent.trim().substring(0, 13)}"을 클릭해주세요!!`}
+            <div>
+              <div
+                key={index}
+                className="space-y-2"
+              >
+                <div className="flex items-center justify-between rounded-md bg-gray-200 px-3 py-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
+                      {index + 1}
+                    </div>
+
+                    <TaskCard
+                      element={elementData[index]}
+                      onTitleChange={(newTitle) => {
+                        const updated = [...elementData];
+                        updated[index].textContent = newTitle;
+                        setElementData(updated);
+                      }}
+                    />
+
+                    <div
+                      key={index}
+                      className="space-y-2"
+                    >
+                      <div className="flex h-32 items-center justify-center rounded-md bg-gray-300 text-gray-600">
+                        <img
+                          src={image}
+                          alt=""
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-                <button className="text-lg text-red-500">⋯</button>
               </div>
-              <div className="flex h-32 items-center justify-center rounded-md bg-gray-300 text-gray-600">
-                <img
-                  src={image}
-                  className="max-h-full max-w-full object-contain"
-                />
-              </div>
-              {index !== images.length - 1 && (
-                <div className="flex justify-center text-2xl text-gray-400">↓</div>
-              )}
             </div>
           ))
         )}
-      </div>
 
-      <div>
-        <div className="flex items-center justify-center">
-          {isCapturing === true ? (
-            <div className="ml-3 flex animate-pulse text-xl text-gray-400">캡쳐중...</div>
-          ) : (
-            <div className="ml-3 flex text-xl text-gray-400">캡쳐 일시중단</div>
-          )}
-        </div>
+        {isCapturing === true ? (
+          <div>
+            <div className="ml-3 flex animate-pulse text-3xl text-white">캡쳐중...</div>
+          </div>
+        ) : (
+          <div>
+            <div className="ml-3 flex text-3xl text-white">캡쳐 일시중단</div>
+          </div>
+        )}
       </div>
+      <div />
 
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
