@@ -1,11 +1,11 @@
 import "@/styles/styles.css";
 import { useEffect, useState, useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import TaskCard from "./TaskCard";
 
 const TaskBoard = () => {
-  const [images, setImages] = useState([]);
-  const [elementData, setElementData] = useState([]);
+  const [steps, setSteps] = useState([]);
   const [isCapturing, setIsCapturing] = useState(true);
 
   const isCapturingRef = useRef(isCapturing);
@@ -24,8 +24,14 @@ const TaskBoard = () => {
 
     const handleMessage = (message) => {
       if (message.type === "CAPTURED_IMAGE" && isCapturingRef.current) {
-        setImages((prev) => [...prev, message.image]);
-        setElementData((prev) => [...prev, message.elementData]);
+        setSteps((prev) => [
+          ...prev,
+          {
+            id: uuidv4(),
+            image: message.image,
+            elementData: message.elementData,
+          },
+        ]);
       }
     };
 
@@ -39,8 +45,8 @@ const TaskBoard = () => {
     isCapturingRef.current = isCapturing;
   }, [isCapturing]);
 
-  const handleDeleteStep = (index) => {
-    console.log("DELETED INDEX: " + index);
+  const handleDeleteStep = (taskId) => {
+    setSteps((prev) => prev.filter((step) => step.id !== taskId));
   };
 
   return (
@@ -61,28 +67,27 @@ const TaskBoard = () => {
       </div>
 
       <div className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
-        {images.length === 0 ? (
+        {steps.length === 0 ? (
           <div className="flex h-full items-center justify-center text-xl text-gray-400">
             캡쳐된 내용이 없습니다.
           </div>
         ) : (
-          images.map((image, index) => (
+          steps.map((step, index) => (
             <div
-              key={index}
+              key={step.id}
               className="space-y-2"
             >
               <TaskCard
                 index={index}
-                element={elementData[index]}
-                image={image}
-                onDeleteStep={() => handleDeleteStep(index)}
+                element={step.elementData}
+                image={step.image}
+                onDeleteStep={() => handleDeleteStep(step.id)}
                 onTitleChange={(newTitle) => {
-                  const updated = [...elementData];
+                  const updated = [...step.elementData];
                   updated[index].textContent = newTitle;
-                  setElementData(updated);
                 }}
               />
-              {index !== images.length - 1 && (
+              {index !== steps.length - 1 && (
                 <div className="flex justify-center text-2xl text-gray-400">↓</div>
               )}
             </div>
