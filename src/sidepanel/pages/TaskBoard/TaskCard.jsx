@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const TaskCard = ({ index, element, image, onTitleChange }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [inputValue, setInputValue] = useState(element.textContent);
+  const [inputValue, setInputValue] = useState(element?.textContent || "");
 
   const handleDoubleClick = () => setIsEditing(true);
   const handleChange = (e) => setInputValue(e.target.value);
@@ -37,7 +37,9 @@ const TaskCard = ({ index, element, image, onTitleChange }) => {
               className="cursor-pointer font-bold"
               onDoubleClick={handleDoubleClick}
             >
-              {inputValue?.trim().substring(0, 13) || '"여기"를 클릭해주세요!!'}
+              {inputValue?.trim()
+                ? `"${inputValue.trim().substring(0, 13)}"를 클릭해주세요`
+                : `"여기"를 클릭해주세요!!`}
             </div>
           )}
         </div>
@@ -46,6 +48,7 @@ const TaskCard = ({ index, element, image, onTitleChange }) => {
       <div className="flex h-32 items-center justify-center rounded-md bg-gray-300 text-gray-600">
         <img
           src={image}
+          alt={`screenshot-${index}`}
           className="max-h-full max-w-full object-contain"
         />
       </div>

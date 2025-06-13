@@ -1,10 +1,18 @@
-import { useEffect, useState } from "react";
+import "@/styles/styles.css";
+import { useEffect, useState, useRef } from "react";
 
 import TaskCard from "./TaskCard";
 
 const TaskBoard = () => {
   const [images, setImages] = useState([]);
   const [elementData, setElementData] = useState([]);
+  const [isCapturing, setIsCapturing] = useState(true);
+
+  const isCapturingRef = useRef(isCapturing);
+
+  const handlePauseClick = () => {
+    setIsCapturing((prev) => !prev);
+  };
 
   useEffect(() => {
     chrome.runtime.sendMessage({ type: "START_CAPTURE" }, () => {
@@ -15,52 +23,88 @@ const TaskBoard = () => {
     });
 
     const handleMessage = (message) => {
-      if (message.type === "CAPTURED_IMAGE") {
+      if (message.type === "CAPTURED_IMAGE" && isCapturingRef.current) {
         setImages((prev) => [...prev, message.image]);
         setElementData((prev) => [...prev, message.elementData]);
       }
     };
 
     chrome.runtime.onMessage.addListener(handleMessage);
-
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
     };
   }, []);
 
+  useEffect(() => {
+    isCapturingRef.current = isCapturing;
+  }, [isCapturing]);
+
   return (
-    <div className="flex h-screen flex-col bg-white">
+    <div className="flex min-h-screen w-full flex-col bg-white">
+      <div className="flex justify-around bg-orange-500 py-4 text-white">
+        <div className="flex flex-col items-center">
+          {isCapturing ? (
+            <div className="flex items-center justify-center">
+              <div className="flex h-12 w-12 items-center justify-center bg-white">
+                <div className="flex h-6 w-6 animate-pulse rounded-full bg-orange-500" />
+              </div>
+              <div className="ml-3 flex animate-pulse text-3xl text-white">캡쳐중...</div>
+            </div>
+          ) : (
+            <div className="ml-3 flex text-3xl text-white">캡쳐 일시중단</div>
+          )}
+        </div>
+      </div>
+
       <div className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
-        {images.map((image, index) => (
-          <TaskCard
-            key={index}
-            index={index}
-            element={elementData[index]}
-            image={image}
-            onTitleChange={(newTitle) => {
-              const updated = [...elementData];
-              updated[index].textContent = newTitle;
-              setElementData(updated);
-            }}
-          />
-        ))}
+        {images.length === 0 ? (
+          <div className="flex h-full items-center justify-center text-xl text-gray-400">
+            캡쳐된 내용이 없습니다.
+          </div>
+        ) : (
+          images.map((image, index) => (
+            <div
+              key={index}
+              className="space-y-2"
+            >
+              <TaskCard
+                index={index}
+                element={elementData[index]}
+                image={image}
+                onTitleChange={(newTitle) => {
+                  const updated = [...elementData];
+                  updated[index].textContent = newTitle;
+                  setElementData(updated);
+                }}
+              />
+              {index !== images.length - 1 && (
+                <div className="flex justify-center text-2xl text-gray-400">↓</div>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
-          <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-green-500">
+          <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl">
             ✓
           </div>
           <span className="mt-1 text-sm">캡쳐완료</span>
         </div>
+
         <div className="flex flex-col items-center">
-          <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-yellow-500">
-            Ⅱ
+          <div
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
+            onClick={handlePauseClick}
+          >
+            {isCapturing ? "ǁ" : <div className="ml-[2px]">▶</div>}
           </div>
-          <span className="mt-1 text-sm">일시중지</span>
+          <span className="mt-1 text-sm">{isCapturing ? "일시중지" : "캡쳐 계속진행"}</span>
         </div>
+
         <div className="flex flex-col items-center">
-          <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-red-500">
+          <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl">
             ✕
           </div>
           <span className="mt-1 text-sm">끄기</span>
