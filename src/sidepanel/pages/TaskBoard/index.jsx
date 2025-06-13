@@ -32,36 +32,23 @@ const TaskBoard = () => {
     <div className="flex h-screen flex-col bg-white">
       <div className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
         {images.map((image, index) => (
-          <div
+          <TaskCard
             key={index}
-            className="space-y-2"
-          >
-            <div className="flex items-center justify-between rounded-md bg-gray-200 px-3 py-2">
-              <div className="flex items-center space-x-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
-                  {index + 1}
-                </div>
-                <TaskCard
-                  element={elementData[index]}
-                  onTitleChange={(newTitle) => {
-                    const updated = [...elementData];
-                    updated[index].textContent = newTitle;
-                    setElementData(updated);
-                  }}
-                />
-              </div>
-              <button className="text-lg text-red-500">⋯</button>
-            </div>
-            <div className="flex h-32 items-center justify-center rounded-md bg-gray-300 text-gray-600">
-              <img
-                src={image}
-                className="max-h-full max-w-full object-contain"
-              />
-            </div>
-            {index !== images.length - 1 && (
-              <div className="flex justify-center text-2xl text-gray-400">↓</div>
-            )}
-          </div>
+            index={index}
+            element={elementData[index]}
+            image={image}
+            onTitleChange={(newTitle) => {
+              const updated = [...elementData];
+              updated[index].textContent = newTitle;
+              setElementData(updated);
+            }}
+            onDelete={() => {
+              const updatedImages = images.filter((_, i) => i !== index);
+              const updatedElements = elementData.filter((_, i) => i !== index);
+              setImages(updatedImages);
+              setElementData(updatedElements);
+            }}
+          />
         ))}
       </div>
 
