@@ -40,7 +40,7 @@ const TaskCard = ({ element, onTitleChange }) => {
         <div className="font-bold">
           {element.textContent === ""
             ? `"여기"를 클릭해주세요!!`
-            : `${element.textContent.trim().substring(0, 13)}`}
+            : `"${element.textContent.trim().substring(0, 13)}"를 클릭해주세요`}
         </div>
       )}
     </div>
