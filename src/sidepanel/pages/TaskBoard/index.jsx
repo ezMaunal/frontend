@@ -42,12 +42,6 @@ const TaskBoard = () => {
               updated[index].textContent = newTitle;
               setElementData(updated);
             }}
-            onDelete={() => {
-              const updatedImages = images.filter((_, i) => i !== index);
-              const updatedElements = elementData.filter((_, i) => i !== index);
-              setImages(updatedImages);
-              setElementData(updatedElements);
-            }}
           />
         ))}
       </div>

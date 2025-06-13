@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const TaskCard = ({ index, element, image, onTitleChange, onDelete }) => {
+const TaskCard = ({ index, element, image, onTitleChange }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(element.textContent);
 
@@ -41,12 +41,6 @@ const TaskCard = ({ index, element, image, onTitleChange, onDelete }) => {
             </div>
           )}
         </div>
-        <button
-          onClick={onDelete}
-          className="text-lg text-red-500 hover:text-red-700"
-        >
-          ⋯
-        </button>
       </div>
 
       <div className="flex h-32 items-center justify-center rounded-md bg-gray-300 text-gray-600">
