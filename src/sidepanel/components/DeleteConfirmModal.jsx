@@ -1,6 +1,6 @@
 import trashIcon from "@/assets/trash-icon.svg";
 
-const DeleteConfirmModal = () => {
+const DeleteConfirmModal = ({ title, message, onCancel, onConfirm }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
@@ -10,16 +10,22 @@ const DeleteConfirmModal = () => {
             alt="삭제 아이콘"
             className="h-6 w-6"
           />
-          <h3 className="text-lg font-semibold text-gray-900">정말 삭제하시겠어요?</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         </div>
 
-        <p className="mt-2 text-sm text-gray-600">삭제하면 이 작업은 되돌릴 수 없습니다.</p>
+        <p className="mt-2 text-sm text-gray-600">{message}</p>
 
         <div className="mt-6 flex justify-end gap-2">
-          <button className="cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+          <button
+            onClick={onCancel}
+            className="cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+          >
             취소
           </button>
-          <button className="cursor-pointer rounded-md bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-500">
+          <button
+            onClick={onConfirm}
+            className="cursor-pointer rounded-md bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-500"
+          >
             확인
           </button>
         </div>
