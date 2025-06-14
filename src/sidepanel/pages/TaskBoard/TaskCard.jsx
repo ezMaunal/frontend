@@ -1,8 +1,11 @@
 import { useState } from "react";
 
+import DeleteConfirmModal from "@/sidepanel/components/DeleteConfirmModal";
+
 const TaskCard = ({ index, element, image, onTitleChange, onDeleteStep }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(element?.textContent || "");
+  const [showModal, setShowModal] = useState(false);
 
   const handleDoubleClick = () => setIsEditing(true);
   const handleChange = (e) => setInputValue(e.target.value);
@@ -14,6 +17,17 @@ const TaskCard = ({ index, element, image, onTitleChange, onDeleteStep }) => {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") finishEditing();
+  };
+
+  const handleDeleteClick = () => {
+    setShowModal(true);
+  };
+  const handleCancelDelete = () => {
+    setShowModal(false);
+  };
+  const handleConfirmDelete = () => {
+    setShowModal(false);
+    onDeleteStep();
   };
 
   return (
@@ -45,7 +59,7 @@ const TaskCard = ({ index, element, image, onTitleChange, onDeleteStep }) => {
         </div>
         <button
           className="cursor-pointer transition-all duration-200 hover:text-2xl"
-          onClick={onDeleteStep}
+          onClick={handleDeleteClick}
         >
           🗑️
         </button>
@@ -58,6 +72,14 @@ const TaskCard = ({ index, element, image, onTitleChange, onDeleteStep }) => {
           className="max-h-full max-w-full object-contain"
         />
       </div>
+      {showModal && (
+        <DeleteConfirmModal
+          title="캡처 이미지 삭제"
+          message="해당 단계를 삭제하시겠습니까?"
+          onCancel={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
     </div>
   );
 };

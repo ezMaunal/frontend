@@ -24,7 +24,7 @@ const DeleteConfirmModal = ({ title, message, onCancel, onConfirm }) => {
           </button>
           <button
             onClick={onConfirm}
-            className="cursor-pointer rounded-md bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-500"
+            className="cursor-pointer rounded-md bg-orange-600 px-4 py-2 text-sm text-white hover:bg-orange-500"
           >
             확인
           </button>
