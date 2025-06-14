@@ -23,6 +23,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  if (message.type === "SEND_COLOR") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        type: "SEND_COLOR",
+        data: message.data,
+      });
+    });
+  }
+
   if (message.type === "CLICKED") {
     chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
       chrome.runtime.sendMessage({
@@ -33,6 +42,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       sendResponse({ status: "captured" });
     });
+
     return true;
   }
 });

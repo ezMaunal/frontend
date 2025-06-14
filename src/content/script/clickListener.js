@@ -1,6 +1,20 @@
 let currentOverlay = null;
 let targetElementInfo = null;
 
+let selectedColor = "#bf0000";
+
+chrome.storage.local.get("selectedColor", (result) => {
+  if (result.selectedColor) {
+    selectedColor = result.selectedColor;
+  }
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "SEND_COLOR") {
+    selectedColor = message.data;
+  }
+});
+
 window.addEventListener("mousedown", (event) => {
   const target = event.target;
   const rect = target.getBoundingClientRect();
@@ -14,7 +28,8 @@ window.addEventListener("mousedown", (event) => {
   overlay.style.left = `${window.scrollX + rect.left - 6}px`;
   overlay.style.width = `${rect.width + 12}px`;
   overlay.style.height = `${rect.height + 12}px`;
-  overlay.style.border = "5px solid rgb(174, 191, 0)";
+  overlay.style.border =
+    selectedColor === undefined ? "5px solid #bf0000" : `5px solid ${selectedColor}`;
   overlay.style.zIndex = "999999";
   overlay.style.pointerEvents = "none";
   document.body.appendChild(overlay);
