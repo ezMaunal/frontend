@@ -7,7 +7,7 @@ const Repository = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <div className="main-container relative">
+    <div className="main-container no-space-between relative">
       <BackButton />
       <div className="mb-6 flex justify-center">
         <span className="text-3xl font-extrabold">저장소</span>
