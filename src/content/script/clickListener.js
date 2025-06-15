@@ -3,6 +3,14 @@ let targetElementInfo = null;
 
 let selectedColor = "#bf0000";
 
+chrome.storage.local.get("isCaptureStopped", (result) => {
+  const stopped = result.isCaptureStopped;
+
+  if (!stopped) {
+    window.addEventListener("mousedown", handleClick);
+  }
+});
+
 chrome.storage.local.get("selectedColor", (result) => {
   if (result.selectedColor) {
     selectedColor = result.selectedColor;
@@ -15,7 +23,28 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
-window.addEventListener("mousedown", (event) => {
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "STOP_CAPTURE") {
+    chrome.storage.local.set({ isCaptureStopped: true });
+    window.removeEventListener("mousedown", handleClick);
+
+    if (currentOverlay) {
+      currentOverlay.remove();
+      currentOverlay = null;
+    }
+
+    targetElementInfo = null;
+  }
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "START_CAPTURE") {
+    chrome.storage.local.set({ isCaptureStopped: false });
+    window.addEventListener("mousedown", handleClick);
+  }
+});
+
+function handleClick(event) {
   const target = event.target;
   const rect = target.getBoundingClientRect();
 
@@ -61,4 +90,4 @@ window.addEventListener("mousedown", (event) => {
       );
     }, 100);
   }
-});
+}
