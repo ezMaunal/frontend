@@ -7,13 +7,13 @@ const Repository = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <div className="main-container no-space-between relative">
+    <div className="main-container no-space-between relative px-2">
       <BackButton />
       <div className="mb-6 flex justify-center">
         <span className="text-3xl font-extrabold">저장소</span>
       </div>
 
-      <div className="relative w-100 rounded-lg border border-gray-300 bg-white p-4 shadow-sm">
+      <div className="relative w-full max-w-sm rounded-lg border border-gray-300 bg-white p-4 shadow-sm">
         <div className="absolute -top-2 -left-2 rounded-full bg-orange-500 px-2 py-1 text-xs text-white shadow">
           #1
         </div>
