@@ -1,6 +1,5 @@
 import "@/styles/styles.css";
 import { useEffect, useState, useRef, useCallback } from "react";
-
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
@@ -18,15 +17,10 @@ const TaskBoard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const navigate = useNavigate();
   const isCapturingRef = useRef(isCapturing);
 
   const goBack = () => {
     navigate(-1);
-  };
-
-  const handlePauseClick = () => {
-    setIsCapturing((prev) => !prev);
   };
 
   const handleCleanupClick = () => {
