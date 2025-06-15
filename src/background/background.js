@@ -29,7 +29,7 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((message, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "CLEANUP_ALL") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (!tabs[0]?.id) return;
