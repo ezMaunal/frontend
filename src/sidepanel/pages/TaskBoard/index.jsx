@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import postManual from "@/api/manual";
 import LoadingModal from "@/sidepanel/components/LoadingModal";
+import WarningModal from "@/sidepanel/components/WarningModal";
 
 import TaskCard from "./TaskCard";
 
@@ -14,6 +15,7 @@ const TaskBoard = () => {
   const [steps, setSteps] = useState([]);
   const [isCapturing, setIsCapturing] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const isCapturingRef = useRef(isCapturing);
 
@@ -70,7 +72,8 @@ const TaskBoard = () => {
       await postManual(body);
       navigate("/repository");
     } catch (error) {
-      console.error("전송 실패:", error);
+      console.error("매뉴얼 생성 에러:", error);
+      setShowModal(true);
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +82,13 @@ const TaskBoard = () => {
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       {isLoading && <LoadingModal />}
-
+      {showModal && (
+        <WarningModal
+          title="실패"
+          message="매뉴얼을 생성하는 중 오류가 발생했습니다."
+          onClose={() => setShowModal(false)}
+        />
+      )}
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
           {isCapturing ? (
