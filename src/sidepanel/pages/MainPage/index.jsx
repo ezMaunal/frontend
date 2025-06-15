@@ -7,6 +7,11 @@ const MainPage = () => {
   const handleStartClick = () => {
     navigate("/taskboard");
   };
+
+  const handleClose = () => {
+    window.close();
+  };
+
   return (
     <div className="main-container">
       <div className="flex w-full max-w-md flex-row justify-center gap-x-4 px-4">
@@ -32,7 +37,10 @@ const MainPage = () => {
           <p className="mb-1 text-xl">매뉴얼 만들기</p>
           <p className="w-48 text-center text-2xl font-bold">START</p>
         </button>
-        <button className="w-48 cursor-pointer rounded-2xl bg-gray-700 px-10 py-4 text-center text-2xl font-bold text-white hover:bg-gray-800">
+        <button
+          className="w-48 cursor-pointer rounded-2xl bg-gray-700 px-10 py-4 text-center text-2xl font-bold text-white hover:bg-gray-800"
+          onClick={handleClose}
+        >
           종 료
         </button>
       </div>
