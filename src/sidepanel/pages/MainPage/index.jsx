@@ -15,7 +15,12 @@ const MainPage = () => {
   return (
     <div className="main-container">
       <div className="flex w-full max-w-md flex-row justify-center gap-x-4 px-4">
-        <button className="btn-orange">저장소</button>
+        <button
+          className="btn-orange"
+          onClick={() => navigate("/repository")}
+        >
+          저장소
+        </button>
         <button
           className="btn-orange"
           onClick={() => navigate("/settings")}
