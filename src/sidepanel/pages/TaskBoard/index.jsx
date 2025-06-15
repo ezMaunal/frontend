@@ -1,5 +1,6 @@
 import "@/styles/styles.css";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import TaskCard from "./TaskCard";
@@ -8,11 +9,39 @@ const TaskBoard = () => {
   const [steps, setSteps] = useState([]);
   const [isCapturing, setIsCapturing] = useState(true);
 
+  const navigate = useNavigate();
   const isCapturingRef = useRef(isCapturing);
+
+  const goBack = () => {
+    navigate(-1);
+  };
 
   const handlePauseClick = () => {
     setIsCapturing((prev) => !prev);
   };
+
+  const handleCleanupClick = () => {
+    chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, () => {
+      if (chrome.runtime.lastError) {
+        console.error("CLEANUP_ALL 전송 오류:", chrome.runtime.lastError.message);
+      } else {
+        console.log("📨 CLEANUP_ALL 메시지 전송됨");
+      }
+    });
+  };
+
+  const handleMessage = useCallback((message) => {
+    if (message.type === "CAPTURED_IMAGE" && isCapturingRef.current) {
+      setSteps((prev) => [
+        ...prev,
+        {
+          id: uuidv4(),
+          image: message.image,
+          elementData: message.elementData,
+        },
+      ]);
+    }
+  }, []);
 
   useEffect(() => {
     chrome.runtime.sendMessage({ type: "START_CAPTURE" }, () => {
@@ -22,24 +51,11 @@ const TaskBoard = () => {
       }
     });
 
-    const handleMessage = (message) => {
-      if (message.type === "CAPTURED_IMAGE" && isCapturingRef.current) {
-        setSteps((prev) => [
-          ...prev,
-          {
-            id: uuidv4(),
-            image: message.image,
-            elementData: message.elementData,
-          },
-        ]);
-      }
-    };
-
     chrome.runtime.onMessage.addListener(handleMessage);
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
     };
-  }, []);
+  }, [handleMessage]);
 
   useEffect(() => {
     isCapturingRef.current = isCapturing;
@@ -114,7 +130,13 @@ const TaskBoard = () => {
         </div>
 
         <div className="flex flex-col items-center">
-          <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl">
+          <div
+            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
+            onClick={() => {
+              goBack();
+              handleCleanupClick();
+            }}
+          >
             ✕
           </div>
           <span className="mt-1 text-sm">끄기</span>
