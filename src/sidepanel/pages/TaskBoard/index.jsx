@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import postManual from "@/api/manual";
+import LoadingModal from "@/sidepanel/components/LoadingModal";
 
 import TaskCard from "./TaskCard";
 
@@ -12,6 +13,7 @@ const TaskBoard = () => {
 
   const [steps, setSteps] = useState([]);
   const [isCapturing, setIsCapturing] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const isCapturingRef = useRef(isCapturing);
 
@@ -62,16 +64,22 @@ const TaskBoard = () => {
     const body = {
       steps: stepData,
     };
+
+    setIsLoading(true);
     try {
       await postManual(body);
       navigate("/repository");
     } catch (error) {
       console.error("전송 실패:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
+      {isLoading && <LoadingModal />}
+
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
           {isCapturing ? (
