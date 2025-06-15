@@ -1,13 +1,22 @@
 import "@/styles/styles.css";
 import { useEffect, useState, useRef, useCallback } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+
+import postManual from "@/api/manual";
+import LoadingModal from "@/sidepanel/components/LoadingModal";
+import WarningModal from "@/sidepanel/components/WarningModal";
 
 import TaskCard from "./TaskCard";
 
 const TaskBoard = () => {
+  const navigate = useNavigate();
+
   const [steps, setSteps] = useState([]);
   const [isCapturing, setIsCapturing] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const navigate = useNavigate();
   const isCapturingRef = useRef(isCapturing);
@@ -65,8 +74,41 @@ const TaskBoard = () => {
     setSteps((prev) => prev.filter((step) => step.id !== taskId));
   };
 
+  const handlePauseClick = () => {
+    setIsCapturing((prev) => !prev);
+  };
+
+  const handleFinishClick = async () => {
+    const stepData = steps.map((step) => ({
+      text: step.elementData.textContent,
+      image: step.image,
+    }));
+    const body = {
+      steps: stepData,
+    };
+
+    setIsLoading(true);
+    try {
+      await postManual(body);
+      navigate("/repository");
+    } catch (error) {
+      console.error("매뉴얼 생성 에러:", error);
+      setShowModal(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
+      {isLoading && <LoadingModal />}
+      {showModal && (
+        <WarningModal
+          title="실패"
+          message="매뉴얼을 생성하는 중 오류가 발생했습니다."
+          onClose={() => setShowModal(false)}
+        />
+      )}
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
           {isCapturing ? (
@@ -113,24 +155,27 @@ const TaskBoard = () => {
 
       <div className="flex justify-around bg-orange-500 py-4 text-white">
         <div className="flex flex-col items-center">
-          <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl">
+          <button
+            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
+            onClick={handleFinishClick}
+          >
             ✓
-          </div>
+          </button>
           <span className="mt-1 text-sm">캡쳐완료</span>
         </div>
 
         <div className="flex flex-col items-center">
-          <div
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
+          <button
+            className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
             onClick={handlePauseClick}
           >
             {isCapturing ? "ǁ" : <div className="ml-[2px]">▶</div>}
-          </div>
+          </button>
           <span className="mt-1 text-sm">{isCapturing ? "일시중지" : "캡쳐 계속진행"}</span>
         </div>
 
         <div className="flex flex-col items-center">
-          <div
+          <button
             className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
             onClick={() => {
               goBack();
@@ -138,7 +183,7 @@ const TaskBoard = () => {
             }}
           >
             ✕
-          </div>
+          </button>
           <span className="mt-1 text-sm">끄기</span>
         </div>
       </div>
