@@ -11,7 +11,7 @@ const BackButton = () => {
   return (
     <div className="absolute top-0 left-0 mt-2 ml-3">
       <button
-        className="text-3xl text-black"
+        className="cursor-pointer text-3xl text-black"
         onClick={goBack}
       >
         &larr;
