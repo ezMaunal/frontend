@@ -3,6 +3,8 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
+import postManual from "@/api/manual";
+
 import TaskCard from "./TaskCard";
 
 const TaskBoard = () => {
@@ -52,8 +54,20 @@ const TaskBoard = () => {
     setIsCapturing((prev) => !prev);
   };
 
-  const handleFinishClick = () => {
-    navigate("/repository");
+  const handleFinishClick = async () => {
+    const stepData = steps.map((step) => ({
+      text: step.elementData.textContent,
+      image: step.image,
+    }));
+    const body = {
+      steps: stepData,
+    };
+    try {
+      await postManual(body);
+      navigate("/repository");
+    } catch (error) {
+      console.error("전송 실패:", error);
+    }
   };
 
   return (
