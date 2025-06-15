@@ -2,11 +2,16 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "START_CAPTURE") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs[0];
+      const tabId = tab.id;
 
+      if (!tab?.id) return;
+
+      chrome.storage.local.set({ isCaptureStopped: false });
+      chrome.tabs.sendMessage(tabId, { type: "START_CAPTURE" });
       chrome.scripting
         .insertCSS({
           target: { tabId: tab.id },
@@ -21,6 +26,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
 
     return true;
+  }
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "CLEANUP_ALL") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (!tabs[0]?.id) return;
+      chrome.tabs.sendMessage(tabs[0].id, {
+        type: "STOP_CAPTURE",
+      });
+    });
+    return;
   }
 
   if (message.type === "SEND_COLOR") {
