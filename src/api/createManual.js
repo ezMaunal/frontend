@@ -2,9 +2,9 @@ import axios from "axios";
 
 import { dataURLtoFile } from "@/utils/dataURLtoFile";
 
-const postManual = async (data) => {
+const createManual = async (data) => {
   const accessToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMTQ5NmJmMy1mNDZjLTQ3ZTMtOGMwMC0xOTUxYzZiMGIzMzQiLCJrYWthb0lkIjoiNDI5NzE2NDcwMSIsImlhdCI6MTc0OTk3Nzg2OCwiZXhwIjoxNzQ5OTk5NDY4fQ.GawUumgPYIBD2yLPoendI3OEVXKKDQXYTxqla7JZpPA";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMTQ5NmJmMy1mNDZjLTQ3ZTMtOGMwMC0xOTUxYzZiMGIzMzQiLCJrYWthb0lkIjoiNDI5NzE2NDcwMSIsImlhdCI6MTc1MDA0OTc0NSwiZXhwIjoxNzUwMDUzMzQ1fQ.7ljMWS9ZCCAjCr-zbMve-eS8j3NHp00istnh-Hh1jyo";
   const serverURL = import.meta.env.VITE_BACKEND_SERVER_URL;
 
   const formData = new FormData();
@@ -21,4 +21,4 @@ const postManual = async (data) => {
   return response.data;
 };
 
-export default postManual;
+export default createManual;
