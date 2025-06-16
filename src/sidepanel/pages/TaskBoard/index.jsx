@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-import postManual from "@/api/manual";
+import createManual from "@/api/createManual";
 import LoadingModal from "@/sidepanel/components/LoadingModal";
 import WarningModal from "@/sidepanel/components/WarningModal";
 
@@ -69,7 +69,7 @@ const TaskBoard = () => {
 
     setIsLoading(true);
     try {
-      await postManual(body);
+      await createManual(body);
       navigate("/repository");
     } catch (error) {
       console.error("매뉴얼 생성 에러:", error);

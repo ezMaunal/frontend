@@ -1,54 +1,66 @@
 import "@/styles/styles.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
+import getManual from "@/api/getManual";
 import BackButton from "@/sidepanel/components/BackButton";
+import LoadingModal from "@/sidepanel/components/LoadingModal";
+import WarningModal from "@/sidepanel/components/WarningModal";
+
+import ManualCard from "./ManualCard";
 
 const Repository = () => {
-  const [showMenu, setShowMenu] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [manualList, setManualList] = useState([]);
+
+  useEffect(() => {
+    const getManualList = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getManual();
+        const manualData = response.data;
+        setManualList(manualData);
+        console.log("매뉴얼 리스트:", manualData);
+      } catch (error) {
+        console.error("매뉴얼 불러오기 실패:", error);
+        setShowModal(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getManualList();
+  }, []);
 
   return (
     <div className="main-container no-space-between relative px-2">
+      {isLoading && <LoadingModal />}
+      {showModal && (
+        <WarningModal
+          title="실패"
+          message="매뉴얼을 불러오는데 실해했습니다."
+          onClose={() => setShowModal(false)}
+        />
+      )}
       <BackButton />
       <div className="mb-6 flex justify-center">
         <span className="text-3xl font-extrabold">저장소</span>
       </div>
-
-      <div className="relative w-full max-w-sm rounded-lg border border-gray-300 bg-white p-4 shadow-sm">
-        <div className="absolute -top-2 -left-2 rounded-full bg-orange-500 px-2 py-1 text-xs text-white shadow">
-          #1
+      {manualList.length === 0 ? (
+        <div className="flex h-full items-center justify-center text-xl text-gray-400">
+          캡쳐된 내용이 없습니다.
         </div>
-
-        <div className="mb-2 flex items-center justify-between">
-          <div className="font-bold text-stone-800">매뉴얼 제목 1</div>
-          <div className="relative">
-            <button
-              className="cursor-pointer text-xl text-gray-500"
-              onClick={() => setShowMenu(!showMenu)}
-            >
-              ⋯
-            </button>
-            {showMenu && (
-              <div className="absolute right-0 z-10 mt-2 w-24 rounded-md border bg-white shadow-md">
-                <button className="w-full cursor-pointer px-3 py-2 text-left text-sm hover:bg-gray-100">
-                  공유
-                </button>
-                <button className="w-full cursor-pointer px-3 py-2 text-left text-sm hover:bg-gray-100">
-                  수정
-                </button>
-                <button className="s w-full px-3 py-2 text-left text-sm text-red-500 hover:bg-red-50">
-                  삭제
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="mb-3 text-sm text-gray-500">2025-04-29</div>
-
-        <div className="flex h-36 w-full items-center justify-center rounded-md bg-gray-200 text-sm text-gray-400">
-          썸네일 이미지
-        </div>
-      </div>
+      ) : (
+        manualList.map((manual) => (
+          <ManualCard
+            key={manual.manualId}
+            index={manual.index}
+            title={manual.name}
+            date={manual.createdAt}
+            thumbnail={manual.thumbnail}
+          />
+        ))
+      )}
     </div>
   );
 };
