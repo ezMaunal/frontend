@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Routes, Route } from "react-router-dom";
+import { useNavigate, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import Login from "@/sidepanel/pages/Login";
 import MainPage from "@/sidepanel/pages/MainPage";
@@ -10,10 +10,14 @@ import DeleteAccount from "@/sidepanel/pages/Settings/DeleteAccount";
 import NoticeDeleteAccount from "@/sidepanel/pages/Settings/DeleteAccount/NoticeDeleteAccount";
 import Option from "@/sidepanel/pages/Settings/Option";
 import TaskBoard from "@/sidepanel/pages/Taskboard";
+import { getCaptureStatus } from "@/utils/storage.js";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -35,6 +39,26 @@ const App = () => {
       navigate("/login");
     }
   }, [isLoggedIn]);
+
+  
+
+  useEffect(() => {
+    getCaptureStatus().then((result) => {
+      console.log(result);
+      setIsCapturing(result);
+    });
+  }, []);
+
+  if (isCapturing === null) return null;
+
+  if (isCapturing && location.pathname !== "/taskboard") {
+    return (
+      <Navigate
+        to="/taskboard"
+        replace
+      />
+    );
+  }
 
   return (
     <Routes>

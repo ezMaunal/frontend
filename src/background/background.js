@@ -25,6 +25,7 @@ chrome.runtime.onMessage.addListener((message) => {
         });
     });
 
+    chrome.storage.local.set({ isCapturing: true });
     return true;
   }
 });
