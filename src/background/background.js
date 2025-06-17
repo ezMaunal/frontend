@@ -1,5 +1,16 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+
+  chrome.tabs.query({}, (tabs) => {
+    for (const tab of tabs) {
+      if (tab.id && /^https?:/.test(tab.url)) {
+        chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ["content/clickListener.js"],
+        });
+      }
+    }
+  });
 });
 
 chrome.runtime.onMessage.addListener((message) => {
