@@ -1,11 +1,12 @@
 import "@/styles/styles.css";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import createManual from "@/api/createManual";
 import LoadingModal from "@/sidepanel/components/LoadingModal";
 import WarningModal from "@/sidepanel/components/WarningModal";
+import { getCaptureStatus, resetCapturedSteps } from "@/utils/storage";
 
 import TaskCard from "./TaskCard";
 
@@ -20,33 +21,32 @@ const TaskBoard = () => {
   const isCapturingRef = useRef(isCapturing);
 
   const goBack = () => {
-    navigate(-1);
+    navigate("/");
   };
 
-  const handleCleanupClick = () => {
-    chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, () => {
+  const handleCleanupClick = async () => {
+    chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, async () => {
       if (chrome.runtime.lastError) {
         console.error("CLEANUP_ALL 전송 오류:", chrome.runtime.lastError.message);
       } else {
         console.log("📨 CLEANUP_ALL 메시지 전송됨");
+        await chrome.storage.local.set({ isCapturing: false });
+
+        const status = await getCaptureStatus();
+        setIsCapturing(status);
+
+        goBack();
       }
     });
+    resetCapturedSteps();
   };
 
-  const handleMessage = useCallback((message) => {
-    if (message.type === "CAPTURED_IMAGE" && isCapturingRef.current) {
-      setSteps((prev) => [
-        ...prev,
-        {
-          id: uuidv4(),
-          image: message.image,
-          elementData: message.elementData,
-        },
-      ]);
-    }
-  }, []);
-
   useEffect(() => {
+    chrome.storage.local.get("CapturedSteps").then(({ CapturedSteps }) => {
+      if (CapturedSteps && Array.isArray(CapturedSteps)) {
+        setSteps(CapturedSteps);
+      }
+    });
     chrome.runtime.sendMessage({ type: "START_CAPTURE" }, () => {
       if (chrome.runtime.lastError) {
         console.error("START_CAPTURE 에러:", chrome.runtime.lastError);
@@ -54,22 +54,48 @@ const TaskBoard = () => {
       }
     });
 
-    chrome.runtime.onMessage.addListener(handleMessage);
-    return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage);
+    const handleStorageChange = (changes, areaName) => {
+      if (areaName === "local" && changes.CapturedSteps && isCapturingRef.current) {
+        const newSteps = changes.CapturedSteps.newValue;
+        const oldSteps = changes.CapturedSteps.oldValue || [];
+
+        const addedStep = newSteps.length > oldSteps.length ? newSteps[newSteps.length - 1] : null;
+        if (!addedStep) return;
+
+        setSteps((prev) => [
+          ...prev,
+          {
+            id: uuidv4(),
+            image: addedStep.image,
+            elementData: addedStep.elementData,
+          },
+        ]);
+      }
     };
-  }, [handleMessage]);
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
+  }, []);
 
   useEffect(() => {
     isCapturingRef.current = isCapturing;
   }, [isCapturing]);
 
   const handleDeleteStep = (taskId) => {
-    setSteps((prev) => prev.filter((step) => step.id !== taskId));
+    setSteps((prev) => {
+      const updatedSteps = prev.filter((step) => step.id !== taskId);
+      chrome.storage.local.set({ CapturedSteps: updatedSteps });
+      return updatedSteps;
+    });
   };
 
   const handlePauseClick = () => {
-    setIsCapturing((prev) => !prev);
+    setIsCapturing((prev) => {
+      chrome.storage.local.set({ isCapturing: !prev });
+      return !prev;
+    });
   };
 
   const handleFinishClick = async () => {
@@ -84,6 +110,7 @@ const TaskBoard = () => {
     setIsLoading(true);
     try {
       await createManual(body);
+      resetCapturedSteps();
       navigate("/repository");
     } catch (error) {
       console.error("매뉴얼 생성 에러:", error);
@@ -171,10 +198,7 @@ const TaskBoard = () => {
         <div className="flex flex-col items-center">
           <button
             className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
-            onClick={() => {
-              goBack();
-              handleCleanupClick();
-            }}
+            onClick={handleCleanupClick}
           >
             ✕
           </button>

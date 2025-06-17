@@ -1,14 +1,37 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+
+  chrome.tabs.query({}, (tabs) => {
+    for (const tab of tabs) {
+      if (tab.id && /^https?:/.test(tab.url)) {
+        chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ["content/clickListener.js"],
+        });
+      }
+    }
+  });
 });
 
-chrome.runtime.onMessage.addListener((message) => {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === "complete" && tab.url && /^https?:/.test(tab.url)) {
+    chrome.scripting.executeScript({
+      target: { tabId },
+      files: ["content/clickListener.js"],
+    });
+  }
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "START_CAPTURE") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs[0];
       const tabId = tab.id;
 
-      if (!tab?.id) return;
+      if (!tab?.id) {
+        sendResponse({ status: "no tab" });
+        return;
+      }
 
       chrome.storage.local.set({ isCaptureStopped: false });
       chrome.tabs.sendMessage(tabId, { type: "START_CAPTURE" });
@@ -22,22 +45,48 @@ chrome.runtime.onMessage.addListener((message) => {
             target: { tabId: tab.id },
             files: ["content/showCaptureStartMessage.js"],
           });
+        })
+        .then(() => {
+          sendResponse({ status: "started" });
+        })
+        .catch((error) => {
+          console.error(error);
+          sendResponse({ status: "error", error: error.message });
         });
     });
 
+    chrome.storage.local.set({ isCapturing: true });
     return true;
   }
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "CLEANUP_ALL") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (!tabs[0]?.id) return;
-      chrome.tabs.sendMessage(tabs[0].id, {
-        type: "STOP_CAPTURE",
+    chrome.tabs.query({}, (tabs) => {
+      if (!tabs || tabs.length === 0) {
+        sendResponse({ success: false });
+        return;
+      }
+
+      let completed = 0;
+
+      tabs.forEach((tab) => {
+        if (!tab.id) return;
+
+        chrome.tabs.sendMessage(tab.id, { type: "STOP_CAPTURE" }, () => {
+          if (chrome.runtime.lastError) {
+            console.log("IGNORE ERROR from background.js - STOP_CAPTURE");
+          }
+          completed++;
+
+          if (completed === tabs.length) {
+            sendResponse({ success: true });
+          }
+        });
       });
     });
-    return;
+
+    return true;
   }
 
   if (message.type === "SEND_COLOR") {
@@ -51,13 +100,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "CLICKED") {
     chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
-      chrome.runtime.sendMessage({
-        type: "CAPTURED_IMAGE",
-        image: dataUrl,
-        elementData: message.elementData,
-      });
+      chrome.storage.local.get("CapturedSteps", (result) => {
+        const currentSteps = Array.isArray(result.CapturedSteps) ? result.CapturedSteps : [];
 
-      sendResponse({ status: "captured" });
+        const updatedSteps = [
+          ...currentSteps,
+          {
+            image: dataUrl,
+            elementData: message.elementData,
+          },
+        ];
+
+        chrome.storage.local.set({ CapturedSteps: updatedSteps }, () => {
+          sendResponse({ status: "captured" });
+        });
+      });
     });
 
     return true;
