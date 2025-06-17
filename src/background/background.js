@@ -32,13 +32,28 @@ chrome.runtime.onMessage.addListener((message) => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "CLEANUP_ALL") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (!tabs[0]?.id) return;
-      chrome.tabs.sendMessage(tabs[0].id, {
-        type: "STOP_CAPTURE",
+    chrome.tabs.query({}, (tabs) => {
+      if (!tabs || tabs.length === 0) {
+        sendResponse({ success: false });
+        return;
+      }
+
+      let completed = 0;
+
+      tabs.forEach((tab) => {
+        if (!tab.id) return;
+
+        chrome.tabs.sendMessage(tab.id, { type: "STOP_CAPTURE" }, () => {
+          completed++;
+
+          if (completed === tabs.length) {
+            sendResponse({ success: true });
+          }
+        });
       });
     });
-    return;
+
+    return true;
   }
 
   if (message.type === "SEND_COLOR") {

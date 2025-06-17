@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import createManual from "@/api/createManual";
 import LoadingModal from "@/sidepanel/components/LoadingModal";
 import WarningModal from "@/sidepanel/components/WarningModal";
+import { setCaptureStatus } from "@/utils/storage";
 
 import TaskCard from "./TaskCard";
 
@@ -24,12 +25,17 @@ const TaskBoard = () => {
   };
 
   const handleCleanupClick = () => {
-    chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, () => {
-      if (chrome.runtime.lastError) {
-        console.error("CLEANUP_ALL 전송 오류:", chrome.runtime.lastError.message);
-      } else {
-        console.log("📨 CLEANUP_ALL 메시지 전송됨");
-      }
+    return new Promise((resolve) => {
+      chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, () => {
+        if (chrome.runtime.lastError) {
+          console.error("CLEANUP_ALL 전송 오류:", chrome.runtime.lastError.message);
+          resolve(false);
+        } else {
+          console.log("📨 CLEANUP_ALL 메시지 전송됨");
+          setCaptureStatus(false);
+          resolve(true);
+        }
+      });
     });
   };
 
@@ -171,9 +177,9 @@ const TaskBoard = () => {
         <div className="flex flex-col items-center">
           <button
             className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
-            onClick={() => {
+            onClick={async () => {
+              await handleCleanupClick();
               goBack();
-              handleCleanupClick();
             }}
           >
             ✕
