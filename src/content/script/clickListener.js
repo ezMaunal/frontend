@@ -2,25 +2,29 @@ let currentOverlay = null;
 let targetElementInfo = null;
 
 let selectedColor = "#bf0000";
-let isCapturing = true;
+let isCapturing = false;
 
 chrome.storage.local.get("isCapturing", (result) => {
   if (result.isCapturing !== undefined) {
     isCapturing = result.isCapturing;
+
+    if (isCapturing) {
+      window.addEventListener("mousedown", handleClick);
+    }
   }
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && changes.isCapturing) {
     isCapturing = changes.isCapturing.newValue;
+
+    if (isCapturing) {
+      window.addEventListener("mousedown", handleClick);
+    } else {
+      window.removeEventListener("mousedown", handleClick);
+    }
   }
 });
-
-if (isCapturing) {
-  window.addEventListener("mousedown", handleClick);
-} else {
-  window.removeEventListener("mousedown", handleClick);
-}
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "SEND_COLOR") {

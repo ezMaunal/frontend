@@ -13,6 +13,15 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === "complete" && tab.url && /^https?:/.test(tab.url)) {
+    chrome.scripting.executeScript({
+      target: { tabId },
+      files: ["content/clickListener.js"],
+    });
+  }
+});
+
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "START_CAPTURE") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
