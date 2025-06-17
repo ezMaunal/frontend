@@ -76,7 +76,10 @@ const TaskBoard = () => {
   };
 
   const handlePauseClick = () => {
-    setIsCapturing((prev) => !prev);
+    setIsCapturing((prev) => {
+      chrome.storage.local.set({ isCapturing: !prev });
+      return !prev;
+    });
   };
 
   const handleFinishClick = async () => {
