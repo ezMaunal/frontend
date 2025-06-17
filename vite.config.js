@@ -41,10 +41,13 @@ export default defineConfig({
     rollupOptions: {
       input: {
         "src/sidepanel/index": path.resolve(__dirname, "src/sidepanel/index.html"),
-        loginPopup: path.resolve(__dirname, "src/sidepanel/login-popup.html"),
+        loginPopup: path.resolve(__dirname, "loginPopup.html"),
       },
     },
     outDir: "dist",
     emptyOutDir: true,
+  },
+  server: {
+    historyApiFallback: true,
   },
 });
