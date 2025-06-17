@@ -40,8 +40,6 @@ const App = () => {
     }
   }, [isLoggedIn]);
 
-  
-
   useEffect(() => {
     getCaptureStatus().then((result) => {
       setIsCapturing(result);
