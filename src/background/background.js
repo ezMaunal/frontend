@@ -44,6 +44,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (!tab.id) return;
 
         chrome.tabs.sendMessage(tab.id, { type: "STOP_CAPTURE" }, () => {
+          if (chrome.runtime.lastError) {
+            console.log("IGNORE ERROR from background.js - STOP_CAPTURE");
+          }
           completed++;
 
           if (completed === tabs.length) {

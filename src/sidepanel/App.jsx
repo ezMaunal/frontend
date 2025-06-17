@@ -44,9 +44,19 @@ const App = () => {
 
   useEffect(() => {
     getCaptureStatus().then((result) => {
-      console.log(result);
       setIsCapturing(result);
     });
+  }, []);
+
+  useEffect(() => {
+    const listener = (changes, area) => {
+      if (area === "local" && changes.isCapturing) {
+        setIsCapturing(changes.isCapturing.newValue);
+      }
+    };
+
+    chrome.storage.onChanged.addListener(listener);
+    return () => chrome.storage.onChanged.removeListener(listener);
   }, []);
 
   if (isCapturing === null) return null;

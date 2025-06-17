@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import createManual from "@/api/createManual";
 import LoadingModal from "@/sidepanel/components/LoadingModal";
 import WarningModal from "@/sidepanel/components/WarningModal";
-import { setCaptureStatus } from "@/utils/storage";
+import { getCaptureStatus } from "@/utils/storage";
 
 import TaskCard from "./TaskCard";
 
@@ -21,21 +21,22 @@ const TaskBoard = () => {
   const isCapturingRef = useRef(isCapturing);
 
   const goBack = () => {
-    navigate(-1);
+    navigate("/");
   };
 
-  const handleCleanupClick = () => {
-    return new Promise((resolve) => {
-      chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, () => {
-        if (chrome.runtime.lastError) {
-          console.error("CLEANUP_ALL 전송 오류:", chrome.runtime.lastError.message);
-          resolve(false);
-        } else {
-          console.log("📨 CLEANUP_ALL 메시지 전송됨");
-          setCaptureStatus(false);
-          resolve(true);
-        }
-      });
+  const handleCleanupClick = async () => {
+    chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, async () => {
+      if (chrome.runtime.lastError) {
+        console.error("CLEANUP_ALL 전송 오류:", chrome.runtime.lastError.message);
+      } else {
+        console.log("📨 CLEANUP_ALL 메시지 전송됨");
+        await chrome.storage.local.set({ isCapturing: false });
+
+        const status = await getCaptureStatus();
+        setIsCapturing(status);
+
+        goBack();
+      }
     });
   };
 
@@ -177,10 +178,7 @@ const TaskBoard = () => {
         <div className="flex flex-col items-center">
           <button
             className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-2xl font-bold text-orange-500 hover:bg-gray-200 hover:text-3xl"
-            onClick={async () => {
-              await handleCleanupClick();
-              goBack();
-            }}
+            onClick={handleCleanupClick}
           >
             ✕
           </button>
