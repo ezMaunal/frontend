@@ -9,3 +9,12 @@ export const getCaptureStatus = () => {
     });
   });
 };
+
+export function resetCapturedSteps(callback) {
+  chrome.storage.local.set({ CapturedSteps: [] }, () => {
+    if (chrome.runtime.lastError) {
+      console.error("CapturedSteps 리셋 실패", chrome.runtime.lastError);
+    }
+    if (callback) callback();
+  });
+}
