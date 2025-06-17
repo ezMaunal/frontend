@@ -1,4 +1,5 @@
 import "@/styles/styles.css";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
@@ -8,8 +9,32 @@ const MainPage = () => {
     navigate("/taskboard");
   };
 
-  const handleClose = () => {
-    window.close();
+  const handleLogoutAndClose = () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      alert("Access Token이 없습니다.");
+      return;
+    }
+
+    axios
+      .post(
+        "http://localhost:8000/api/auth/kakao/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        },
+      )
+      .then(() => {
+        localStorage.removeItem("accessToken");
+        window.close();
+      })
+      .catch(() => {
+        alert("로그아웃 중 오류가 발생했습니다.");
+      });
   };
 
   return (
@@ -44,7 +69,7 @@ const MainPage = () => {
         </button>
         <button
           className="w-48 cursor-pointer rounded-2xl bg-gray-700 px-10 py-4 text-center text-2xl font-bold text-white hover:bg-gray-800"
-          onClick={handleClose}
+          onClick={handleLogoutAndClose}
         >
           종 료
         </button>
