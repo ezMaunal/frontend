@@ -10,6 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
+  base: "./",
+
   plugins: [
     react(),
     tailwindcss(),
@@ -38,7 +40,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        sidepanel: path.resolve(__dirname, "src/sidepanel/index.html"),
+        "src/sidepanel/index": path.resolve(__dirname, "src/sidepanel/index.html"),
+        loginPopup: path.resolve(__dirname, "src/sidepanel/login-popup.html"),
       },
     },
     outDir: "dist",
