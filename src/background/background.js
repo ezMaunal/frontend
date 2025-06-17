@@ -22,13 +22,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "START_CAPTURE") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs[0];
       const tabId = tab.id;
 
-      if (!tab?.id) return;
+      if (!tab?.id) {
+        sendResponse({ status: "no tab" });
+        return;
+      }
 
       chrome.storage.local.set({ isCaptureStopped: false });
       chrome.tabs.sendMessage(tabId, { type: "START_CAPTURE" });
@@ -42,6 +45,13 @@ chrome.runtime.onMessage.addListener((message) => {
             target: { tabId: tab.id },
             files: ["content/showCaptureStartMessage.js"],
           });
+        })
+        .then(() => {
+          sendResponse({ status: "started" });
+        })
+        .catch((error) => {
+          console.error(error);
+          sendResponse({ status: "error", error: error.message });
         });
     });
 
@@ -90,13 +100,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "CLICKED") {
     chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
-      chrome.runtime.sendMessage({
-        type: "CAPTURED_IMAGE",
-        image: dataUrl,
-        elementData: message.elementData,
-      });
+      chrome.storage.local.get("CapturedSteps", (result) => {
+        const currentSteps = Array.isArray(result.CapturedSteps) ? result.CapturedSteps : [];
 
-      sendResponse({ status: "captured" });
+        const updatedSteps = [
+          ...currentSteps,
+          {
+            image: dataUrl,
+            elementData: message.elementData,
+          },
+        ];
+
+        chrome.storage.local.set({ CapturedSteps: updatedSteps }, () => {
+          sendResponse({ status: "captured" });
+        });
+      });
     });
 
     return true;

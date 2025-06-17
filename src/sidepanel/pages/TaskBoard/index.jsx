@@ -1,12 +1,12 @@
 import "@/styles/styles.css";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import createManual from "@/api/createManual";
 import LoadingModal from "@/sidepanel/components/LoadingModal";
 import WarningModal from "@/sidepanel/components/WarningModal";
-import { getCaptureStatus } from "@/utils/storage";
+import { getCaptureStatus, resetCapturedSteps } from "@/utils/storage";
 
 import TaskCard from "./TaskCard";
 
@@ -38,22 +38,15 @@ const TaskBoard = () => {
         goBack();
       }
     });
+    resetCapturedSteps();
   };
 
-  const handleMessage = useCallback((message) => {
-    if (message.type === "CAPTURED_IMAGE" && isCapturingRef.current) {
-      setSteps((prev) => [
-        ...prev,
-        {
-          id: uuidv4(),
-          image: message.image,
-          elementData: message.elementData,
-        },
-      ]);
-    }
-  }, []);
-
   useEffect(() => {
+    chrome.storage.local.get("CapturedSteps").then(({ CapturedSteps }) => {
+      if (CapturedSteps && Array.isArray(CapturedSteps)) {
+        setSteps(CapturedSteps);
+      }
+    });
     chrome.runtime.sendMessage({ type: "START_CAPTURE" }, () => {
       if (chrome.runtime.lastError) {
         console.error("START_CAPTURE 에러:", chrome.runtime.lastError);
@@ -61,18 +54,41 @@ const TaskBoard = () => {
       }
     });
 
-    chrome.runtime.onMessage.addListener(handleMessage);
-    return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage);
+    const handleStorageChange = (changes, areaName) => {
+      if (areaName === "local" && changes.CapturedSteps && isCapturingRef.current) {
+        const newSteps = changes.CapturedSteps.newValue;
+        const oldSteps = changes.CapturedSteps.oldValue || [];
+
+        const addedStep = newSteps.length > oldSteps.length ? newSteps[newSteps.length - 1] : null;
+        if (!addedStep) return;
+
+        setSteps((prev) => [
+          ...prev,
+          {
+            id: uuidv4(),
+            image: addedStep.image,
+            elementData: addedStep.elementData,
+          },
+        ]);
+      }
     };
-  }, [handleMessage]);
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
+  }, []);
 
   useEffect(() => {
     isCapturingRef.current = isCapturing;
   }, [isCapturing]);
 
   const handleDeleteStep = (taskId) => {
-    setSteps((prev) => prev.filter((step) => step.id !== taskId));
+    setSteps((prev) => {
+      const updatedSteps = prev.filter((step) => step.id !== taskId);
+      chrome.storage.local.set({ CapturedSteps: updatedSteps });
+      return updatedSteps;
+    });
   };
 
   const handlePauseClick = () => {
@@ -94,6 +110,7 @@ const TaskBoard = () => {
     setIsLoading(true);
     try {
       await createManual(body);
+      resetCapturedSteps();
       navigate("/repository");
     } catch (error) {
       console.error("매뉴얼 생성 에러:", error);
