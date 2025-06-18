@@ -33,7 +33,7 @@ export const stopCaptureAllTabs = (sendResponse) => {
     tabs.forEach((tab) => {
       if (!tab.id) return;
 
-      chrome.tabs.sendMessage(tab.id, { type: "STOP_CAPTURE" }, () => {
+      chrome.tabs.sendMessage(tab.id, { type: MESSAGE_TYPES.STOP_CAPTURE }, () => {
         completed++;
 
         if (completed === tabs.length) {
@@ -49,7 +49,7 @@ export const stopCaptureAllTabs = (sendResponse) => {
 export const sendColor = (colorData) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, {
-      type: "SEND_COLOR",
+      type: MESSAGE_TYPES.SEND_COLOR,
       data: colorData,
     });
   });
