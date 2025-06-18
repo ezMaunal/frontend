@@ -10,30 +10,14 @@ export const startCapture = (sendResponse) => {
       return;
     }
 
-    chrome.storage.local.set({ isCaptureStopped: false });
-    chrome.tabs.sendMessage(tabId, { type: MESSAGE_TYPES.START_CAPTURE });
+    chrome.storage.local.set({ isCaptureStopped: false, isCapturing: true });
 
-    chrome.scripting
-      .insertCSS({
-        target: { tabId },
-        files: ["style/style.css"],
-      })
-      .then(() => {
-        return chrome.scripting.executeScript({
-          target: { tabId },
-          files: ["content/showCaptureStartMessage.js"],
-        });
-      })
-      .then(() => {
-        sendResponse({ status: "started" });
-      })
-      .catch((error) => {
-        console.error("startCapture error:", error);
-        sendResponse({ status: "error", error: error.message });
-      });
+    chrome.tabs.sendMessage(tabId, { type: MESSAGE_TYPES.START_CAPTURE });
+    chrome.tabs.sendMessage(tabId, { type: MESSAGE_TYPES.SHOW_CAPTURE_MESSAGE });
+
+    sendResponse({ status: "started" });
   });
 
-  chrome.storage.local.set({ isCapturing: true });
   return true;
 };
 

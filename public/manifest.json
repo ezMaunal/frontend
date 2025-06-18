@@ -24,7 +24,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content/clickListener.js"],
+      "js": ["content/clickListener.js", "content/showCaptureStartMessage.js"],
       "run_at": "document_idle"
     }
   ]

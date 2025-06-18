@@ -28,6 +28,9 @@ const useTaskHandlers = ({ steps, setSteps, setIsCapturing, setIsLoading, setSho
   const handlePauseClick = () => {
     setIsCapturing((prev) => {
       chrome.storage.local.set({ isCapturing: !prev });
+      if (prev === false) {
+        chrome.runtime.sendMessage({ type: "START_CAPTURE" });
+      }
       return !prev;
     });
   };
