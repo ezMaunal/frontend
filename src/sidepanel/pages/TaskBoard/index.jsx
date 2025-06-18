@@ -8,9 +8,9 @@ import LoadingModal from "@/sidepanel/components/LoadingModal";
 import WarningModal from "@/sidepanel/components/WarningModal";
 import { getCaptureStatus, resetCapturedSteps } from "@/utils/storage";
 
-import TaskCard from "./TaskCard";
 import TaskControlBar from "./TaskControlBar";
 import TaskStatusHeader from "./TaskStatusHeader";
+import TaskStepsRenderer from "./TaskStepsRenderer";
 
 const TaskBoard = () => {
   const navigate = useNavigate();
@@ -25,7 +25,15 @@ const TaskBoard = () => {
   const goBack = () => {
     navigate("/");
   };
+  const handleTitleChange = (index, newTitle) => {
+    setSteps((prev) => {
+      const updated = [...prev];
+      updated[index].elementData.textContent = newTitle;
 
+      chrome.storage.local.set({ CapturedSteps: updated });
+      return updated;
+    });
+  };
   const handleCleanupClick = async () => {
     chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, async () => {
       if (chrome.runtime.lastError) {
@@ -135,34 +143,11 @@ const TaskBoard = () => {
 
       <TaskStatusHeader isCapturing={isCapturing} />
 
-      <div className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
-        {steps.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-xl text-gray-400">
-            캡쳐된 내용이 없습니다.
-          </div>
-        ) : (
-          steps.map((step, index) => (
-            <div
-              key={step.id}
-              className="space-y-2"
-            >
-              <TaskCard
-                index={index}
-                element={step.elementData}
-                image={step.image}
-                onDeleteStep={() => handleDeleteStep(step.id)}
-                onTitleChange={(newTitle) => {
-                  const updated = [...step.elementData];
-                  updated[index].textContent = newTitle;
-                }}
-              />
-              {index !== steps.length - 1 && (
-                <div className="flex justify-center text-2xl text-gray-400">↓</div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
+      <TaskStepsRenderer
+        steps={steps}
+        handleDeleteStep={handleDeleteStep}
+        handleTitleChange={handleTitleChange}
+      />
 
       <TaskControlBar
         isCapturing={isCapturing}
