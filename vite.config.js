@@ -18,7 +18,7 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: "src/background/background.js",
+          src: "src/background/*",
           dest: "background",
         },
         {
@@ -28,6 +28,10 @@ export default defineConfig({
         {
           src: "src/content/script/*",
           dest: "content",
+        },
+        {
+          src: "src/constants/*",
+          dest: "constants",
         },
       ],
     }),
