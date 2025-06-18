@@ -13,16 +13,12 @@ const MainPage = () => {
     navigate("/taskboard");
   };
 
-  const handleLogoutAndClose = () => {
+  const handleLogoutAndClose = async () => {
     const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) return;
 
-    if (!accessToken) {
-      alert("Access Token이 없습니다.");
-      return;
-    }
-
-    axios
-      .post(
+    try {
+      await axios.post(
         `${import.meta.env.VITE_BACKEND_SERVER_URL}/api/auth/kakao/logout`,
         {},
         {
@@ -31,14 +27,13 @@ const MainPage = () => {
           },
           withCredentials: true,
         },
-      )
-      .then(() => {
-        localStorage.removeItem("accessToken");
-        window.close();
-      })
-      .catch(() => {
-        setShowModal(true);
-      });
+      );
+
+      localStorage.removeItem("accessToken");
+      window.close();
+    } catch {
+      setShowModal(true);
+    }
   };
 
   return (

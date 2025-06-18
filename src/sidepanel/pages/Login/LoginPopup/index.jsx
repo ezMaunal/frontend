@@ -10,27 +10,29 @@ const LoginPopup = () => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
+    const handleLogin = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
 
-    if (code) {
-      axios
-        .post(
+      if (!code) return;
+      try {
+        const res = await axios.post(
           `${import.meta.env.VITE_BACKEND_SERVER_URL}/api/auth/kakao/login`,
           { code },
           { withCredentials: true },
-        )
-        .then((res) => {
-          const { token } = res.data;
-          if (token) {
-            window.opener.postMessage({ token }, "*");
-            window.close();
-          }
-        })
-        .catch(() => {
-          setShowModal(true);
-        });
-    }
+        );
+
+        const { token } = res.data;
+        if (token) {
+          window.opener.postMessage({ token }, "*");
+          window.close();
+        }
+      } catch {
+        setShowModal(true);
+      }
+    };
+
+    handleLogin();
   }, []);
 
   return (
