@@ -3,8 +3,7 @@ import axios from "axios";
 import { dataURLtoFile } from "@/utils/dataURLtoFile";
 
 const postManual = async (data) => {
-  const accessToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMTQ5NmJmMy1mNDZjLTQ3ZTMtOGMwMC0xOTUxYzZiMGIzMzQiLCJrYWthb0lkIjoiNDI5NzE2NDcwMSIsImlhdCI6MTc0OTk3Nzg2OCwiZXhwIjoxNzQ5OTk5NDY4fQ.GawUumgPYIBD2yLPoendI3OEVXKKDQXYTxqla7JZpPA";
+  const accessToken = localStorage.getItem("accessToken");
   const serverURL = import.meta.env.VITE_BACKEND_SERVER_URL;
 
   const formData = new FormData();

@@ -1,7 +1,9 @@
 import "@/styles/styles.css";
 import { useState, useEffect } from "react";
 
+import deleteManual from "@/api/deleteManual";
 import getManual from "@/api/getManual";
+import updateManual from "@/api/updateManual";
 import BackButton from "@/sidepanel/components/BackButton";
 import LoadingModal from "@/sidepanel/components/LoadingModal";
 import WarningModal from "@/sidepanel/components/WarningModal";
@@ -18,9 +20,7 @@ const Repository = () => {
       setIsLoading(true);
       try {
         const response = await getManual();
-        const manualData = response.data;
-        setManualList(manualData);
-        console.log("매뉴얼 리스트:", manualData);
+        setManualList(response.data);
       } catch (error) {
         console.error("매뉴얼 불러오기 실패:", error);
         setShowModal(true);
@@ -32,13 +32,34 @@ const Repository = () => {
     getManualList();
   }, []);
 
+  const handleDelete = async (manualId) => {
+    try {
+      await deleteManual(manualId);
+      setManualList((prev) => prev.filter((item) => item.manualId !== manualId));
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      setShowModal(true);
+    }
+  };
+
+  const handleUpdate = async (manualId, newName) => {
+    try {
+      await updateManual(manualId, { name: newName });
+      setManualList((prev) =>
+        prev.map((m) => (m.manualId === manualId ? { ...m, name: newName } : m)),
+      );
+    } catch (err) {
+      console.error("수정 실패:", err);
+    }
+  };
+
   return (
     <div className="main-container no-space-between relative px-2">
       {isLoading && <LoadingModal />}
       {showModal && (
         <WarningModal
           title="실패"
-          message="매뉴얼을 불러오는데 실해했습니다."
+          message="작업 도중 오류가 발생했습니다."
           onClose={() => setShowModal(false)}
         />
       )}
@@ -48,16 +69,19 @@ const Repository = () => {
       </div>
       {manualList.length === 0 ? (
         <div className="flex h-full items-center justify-center text-xl text-gray-400">
-          캡쳐된 내용이 없습니다.
+          저장된 매뉴얼이 없습니다.
         </div>
       ) : (
-        manualList.map((manual) => (
+        manualList.map((manual, idx) => (
           <ManualCard
             key={manual.manualId}
-            index={manual.index}
+            index={idx + 1}
             title={manual.name}
             date={manual.createdAt}
             thumbnail={manual.thumbnail}
+            manualId={manual.manualId}
+            onDelete={handleDelete}
+            onUpdate={handleUpdate}
           />
         ))
       )}
