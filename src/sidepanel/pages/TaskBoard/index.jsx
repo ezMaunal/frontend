@@ -9,6 +9,7 @@ import WarningModal from "@/sidepanel/components/WarningModal";
 import { getCaptureStatus, resetCapturedSteps } from "@/utils/storage";
 
 import TaskCard from "./TaskCard";
+import TaskStatusHeader from "./TaskStatusHeader";
 
 const TaskBoard = () => {
   const navigate = useNavigate();
@@ -130,20 +131,8 @@ const TaskBoard = () => {
           onClose={() => setShowModal(false)}
         />
       )}
-      <div className="flex justify-around bg-orange-500 py-4 text-white">
-        <div className="flex flex-col items-center">
-          {isCapturing ? (
-            <div className="flex items-center justify-center">
-              <div className="flex h-12 w-12 items-center justify-center bg-white">
-                <div className="flex h-6 w-6 animate-pulse rounded-full bg-orange-500" />
-              </div>
-              <div className="ml-3 flex animate-pulse text-3xl text-white">캡쳐중...</div>
-            </div>
-          ) : (
-            <div className="ml-3 flex text-3xl text-white">캡쳐 일시중단</div>
-          )}
-        </div>
-      </div>
+
+      <TaskStatusHeader isCapturing={isCapturing} />
 
       <div className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
         {steps.length === 0 ? (
