@@ -2,6 +2,7 @@ import "@/styles/styles.css";
 import { useEffect, useState, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { MESSAGE_TYPES } from "@/constants/chromeMessageType";
 import useTaskHandlers from "@/hooks/useTaskHandlers";
 import LoadingModal from "@/sidepanel/components/LoadingModal";
 import WarningModal from "@/sidepanel/components/WarningModal";
@@ -38,7 +39,8 @@ const TaskBoard = () => {
         setSteps(CapturedSteps);
       }
     });
-    chrome.runtime.sendMessage({ type: "START_CAPTURE" });
+
+    chrome.runtime.sendMessage({ type: MESSAGE_TYPES.START_CAPTURE });
 
     const handleStorageChange = (changes, areaName) => {
       if (areaName === "local" && changes.CapturedSteps && isCapturingRef.current) {
