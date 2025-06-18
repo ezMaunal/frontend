@@ -63,7 +63,7 @@ const Repository = () => {
           onClose={() => setShowModal(false)}
         />
       )}
-      <BackButton />
+      <BackButton to="/" />
       <div className="mb-6 flex justify-center">
         <span className="text-3xl font-extrabold">저장소</span>
       </div>
