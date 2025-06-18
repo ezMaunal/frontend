@@ -51,9 +51,7 @@ const TaskCard = ({ index, element, image, onTitleChange, onDeleteStep }) => {
               className="cursor-pointer font-bold"
               onDoubleClick={handleDoubleClick}
             >
-              {inputValue?.trim()
-                ? `"${inputValue.trim().substring(0, 13)}"를 클릭해주세요`
-                : `"여기"를 클릭해주세요!!`}
+              {inputValue || `"여기"를 클릭해주세요!!`}
             </div>
           )}
         </div>
