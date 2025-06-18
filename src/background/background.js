@@ -33,7 +33,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     });
     chrome.scripting.executeScript({
       target: { tabId },
-      files: ["content/clickListener.js"],
+      files: ["content/clickListener.js", "content/showCaptureStartMessage.js"],
     });
   }
 });
