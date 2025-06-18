@@ -25,7 +25,15 @@ const TaskBoard = () => {
   const goBack = () => {
     navigate("/");
   };
+  const handleTitleChange = (index, newTitle) => {
+    setSteps((prev) => {
+      const updated = [...prev];
+      updated[index].elementData.textContent = newTitle;
 
+      chrome.storage.local.set({ CapturedSteps: updated });
+      return updated;
+    });
+  };
   const handleCleanupClick = async () => {
     chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, async () => {
       if (chrome.runtime.lastError) {
@@ -151,10 +159,7 @@ const TaskBoard = () => {
                 element={step.elementData}
                 image={step.image}
                 onDeleteStep={() => handleDeleteStep(step.id)}
-                onTitleChange={(newTitle) => {
-                  const updated = [...step.elementData];
-                  updated[index].textContent = newTitle;
-                }}
+                onTitleChange={(newTitle) => handleTitleChange(index, newTitle)}
               />
               {index !== steps.length - 1 && (
                 <div className="flex justify-center text-2xl text-gray-400">↓</div>
