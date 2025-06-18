@@ -1,11 +1,15 @@
 import "@/styles/styles.css";
 import { useNavigate } from "react-router-dom";
 
-const BackButton = () => {
+const BackButton = ({ to }) => {
   const navigate = useNavigate();
 
   const goBack = () => {
-    navigate(-1);
+    if (to) {
+      navigate(to);
+    } else {
+      navigate(-1);
+    }
   };
 
   return (
@@ -13,6 +17,7 @@ const BackButton = () => {
       <button
         className="cursor-pointer text-3xl text-black"
         onClick={goBack}
+        aria-label="뒤로가기"
       >
         &larr;
       </button>
