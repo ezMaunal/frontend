@@ -43,6 +43,10 @@ const useTaskHandlers = ({ steps, setSteps, setIsCapturing, setIsLoading, setSho
     setIsLoading(true);
     try {
       await createManual(body);
+      await chrome.storage.local.set({ isCapturing: false });
+
+      const status = await getCaptureStatus();
+      setIsCapturing(status);
       resetCapturedSteps();
       navigate("/repository");
     } catch (error) {
