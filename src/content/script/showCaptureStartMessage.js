@@ -1,4 +1,12 @@
 if (!window.haveCaptureStartMessage) {
+  const MESSAGE_TYPES = {
+    START_CAPTURE: "START_CAPTURE",
+    STOP_CAPTURE: "STOP_CAPTURE",
+    CLEANUP_ALL: "CLEANUP_ALL",
+    SEND_COLOR: "SEND_COLOR",
+    CLICKED: "CLICKED",
+    SHOW_CAPTURE_MESSAGE: "SHOW_CAPTURE_MESSAGE",
+  };
   window.haveCaptureStartMessage = true;
 
   const showStartCaptureMessage = () => {
@@ -14,7 +22,7 @@ if (!window.haveCaptureStartMessage) {
   };
 
   chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === "SHOW_CAPTURE_MESSAGE") {
+    if (message.type === MESSAGE_TYPES.SHOW_CAPTURE_MESSAGE) {
       showStartCaptureMessage();
     }
   });
