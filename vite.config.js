@@ -29,6 +29,10 @@ export default defineConfig({
           src: "src/content/script/*",
           dest: "content",
         },
+        {
+          src: "src/constants/*",
+          dest: "constants",
+        },
       ],
     }),
   ],

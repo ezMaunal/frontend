@@ -1,3 +1,5 @@
+import { MESSAGE_TYPES } from "../constants/chromeMessageType.js";
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 
@@ -22,41 +24,46 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "START_CAPTURE") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const tab = tabs[0];
-      const tabId = tab.id;
+const startCapture = (sendResponse) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tab = tabs[0];
+    const tabId = tab?.id;
 
-      if (!tab?.id) {
-        sendResponse({ status: "no tab" });
-        return;
-      }
+    if (!tabId) {
+      sendResponse({ status: "no tab" });
+      return;
+    }
 
-      chrome.storage.local.set({ isCaptureStopped: false });
-      chrome.tabs.sendMessage(tabId, { type: "START_CAPTURE" });
-      chrome.scripting
-        .insertCSS({
-          target: { tabId: tab.id },
-          files: ["style/style.css"],
-        })
-        .then(() => {
-          return chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ["content/showCaptureStartMessage.js"],
-          });
-        })
-        .then(() => {
-          sendResponse({ status: "started" });
-        })
-        .catch((error) => {
-          console.error(error);
-          sendResponse({ status: "error", error: error.message });
+    chrome.storage.local.set({ isCaptureStopped: false });
+    chrome.tabs.sendMessage(tabId, { type: MESSAGE_TYPES.START_CAPTURE });
+
+    chrome.scripting
+      .insertCSS({
+        target: { tabId },
+        files: ["style/style.css"],
+      })
+      .then(() => {
+        return chrome.scripting.executeScript({
+          target: { tabId },
+          files: ["content/showCaptureStartMessage.js"],
         });
-    });
+      })
+      .then(() => {
+        sendResponse({ status: "started" });
+      })
+      .catch((error) => {
+        console.error("startCapture error:", error);
+        sendResponse({ status: "error", error: error.message });
+      });
+  });
 
-    chrome.storage.local.set({ isCapturing: true });
-    return true;
+  chrome.storage.local.set({ isCapturing: true });
+  return true;
+};
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === MESSAGE_TYPES.START_CAPTURE) {
+    return startCapture(sendResponse);
   }
 });
 
