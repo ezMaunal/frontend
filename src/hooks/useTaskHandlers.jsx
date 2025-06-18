@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 
 import createManual from "@/api/createManual";
-import { resetCapturedSteps } from "@/utils/storage";
-import { getCaptureStatus } from "@/utils/storage";
+import { MESSAGE_TYPES } from "@/constants/chromeMessageType";
+import { resetCapturedSteps, getCaptureStatus } from "@/utils/storage";
 
 const useTaskHandlers = ({ steps, setSteps, setIsCapturing, setIsLoading, setShowModal }) => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const useTaskHandlers = ({ steps, setSteps, setIsCapturing, setIsLoading, setSho
     setIsCapturing((prev) => {
       chrome.storage.local.set({ isCapturing: !prev });
       if (prev === false) {
-        chrome.runtime.sendMessage({ type: "START_CAPTURE" });
+        chrome.runtime.sendMessage({ type: MESSAGE_TYPES.START_CAPTURE });
       }
       return !prev;
     });
@@ -60,7 +60,7 @@ const useTaskHandlers = ({ steps, setSteps, setIsCapturing, setIsLoading, setSho
     }
   };
   const handleCleanupClick = async () => {
-    chrome.runtime.sendMessage({ type: "CLEANUP_ALL" }, async () => {
+    chrome.runtime.sendMessage({ type: MESSAGE_TYPES.CLEANUP_ALL }, async () => {
       if (chrome.runtime.lastError) {
         console.error("CLEANUP_ALL 전송 오류:", chrome.runtime.lastError.message);
       } else {
