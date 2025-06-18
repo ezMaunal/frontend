@@ -40,9 +40,9 @@ const Option = () => {
         <input
           id="colorInput"
           type="color"
+          value={squareColor}
           onChange={handleChange}
           className="h-32 w-32 cursor-pointer rounded border border-black"
-          defaultValue={squareColor}
         />
       </div>
     </div>
