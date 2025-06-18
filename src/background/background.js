@@ -12,9 +12,13 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.tabs.query({}, (tabs) => {
     for (const tab of tabs) {
       if (tab.id && /^https?:/.test(tab.url)) {
+        chrome.scripting.insertCSS({
+          target: { tabId: tab.id },
+          files: ["style/style.css"],
+        });
         chrome.scripting.executeScript({
           target: { tabId: tab.id },
-          files: ["content/clickListener.js"],
+          files: ["content/clickListener.js", "content/showCaptureStartMessage.js"],
         });
       }
     }
@@ -23,6 +27,10 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url && /^https?:/.test(tab.url)) {
+    chrome.scripting.insertCSS({
+      target: { tabId: tab.id },
+      files: ["style/style.css"],
+    });
     chrome.scripting.executeScript({
       target: { tabId },
       files: ["content/clickListener.js"],

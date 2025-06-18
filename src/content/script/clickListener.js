@@ -1,5 +1,5 @@
-let currentOverlay = null;
-let targetElementInfo = null;
+if (!window.ezmanual_click_listener_injected) {
+  window.ezmanual_click_listener_injected = true;
 
 let selectedColor = "#ff0000";
 let isCapturing = false;
@@ -14,49 +14,53 @@ chrome.storage.local.get("isCapturing", (result) => {
   if (result.isCapturing !== undefined) {
     isCapturing = result.isCapturing;
 
-    if (isCapturing) {
-      window.addEventListener("mousedown", handleClick);
+  chrome.storage.local.get("isCapturing", (result) => {
+    if (result.isCapturing !== undefined) {
+      isCapturing = result.isCapturing;
+
+      if (isCapturing) {
+        window.addEventListener("mousedown", handleClick);
+      }
     }
-  }
-});
+  });
 
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && changes.isCapturing) {
-    isCapturing = changes.isCapturing.newValue;
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.isCapturing) {
+      isCapturing = changes.isCapturing.newValue;
 
-    if (isCapturing) {
-      window.addEventListener("mousedown", handleClick);
-    } else {
+      if (isCapturing) {
+        window.addEventListener("mousedown", handleClick);
+      } else {
+        window.removeEventListener("mousedown", handleClick);
+      }
+    }
+  });
+
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === "SEND_COLOR") {
+      selectedColor = message.data;
+    } else if (message.type === "STOP_CAPTURE") {
+      chrome.storage.local.set({ isCapturing: false });
       window.removeEventListener("mousedown", handleClick);
+
+      if (currentOverlay) {
+        currentOverlay.remove();
+        currentOverlay = null;
+      }
+      targetElementInfo = null;
+    } else if (message.type === "START_CAPTURE") {
+      chrome.storage.local.set({ isCapturing: true });
+      window.addEventListener("mousedown", handleClick);
     }
-  }
-});
+  });
 
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.type === "SEND_COLOR") {
-    selectedColor = message.data;
-  } else if (message.type === "STOP_CAPTURE") {
-    chrome.storage.local.set({ isCapturing: false });
-    window.removeEventListener("mousedown", handleClick);
+  function handleClick(event) {
+    if (!isCapturing) return;
 
-    if (currentOverlay) {
-      currentOverlay.remove();
-      currentOverlay = null;
-    }
-    targetElementInfo = null;
-  } else if (message.type === "START_CAPTURE") {
-    chrome.storage.local.set({ isCapturing: true });
-    window.addEventListener("mousedown", handleClick);
-  }
-});
+    const target = event.target;
+    const rect = target.getBoundingClientRect();
 
-function handleClick(event) {
-  if (!isCapturing) return;
-
-  const target = event.target;
-  const rect = target.getBoundingClientRect();
-
-  if (currentOverlay) currentOverlay.remove();
+    if (currentOverlay) currentOverlay.remove();
 
   const overlay = document.createElement("div");
   overlay.id = "red-outline-box";
@@ -72,30 +76,31 @@ function handleClick(event) {
   document.body.appendChild(overlay);
   currentOverlay = overlay;
 
-  targetElementInfo = {
-    tagName: target.tagName,
-    textContent: target.textContent,
-  };
+    targetElementInfo = {
+      tagName: target.tagName,
+      textContent: target.textContent,
+    };
 
-  if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
-    setTimeout(() => {
-      chrome.runtime.sendMessage(
-        {
-          type: "CLICKED",
-          elementData: targetElementInfo,
-        },
-        (res) => {
-          if (res && res.status === "captured") {
-            if (currentOverlay) {
-              currentOverlay.remove();
-              currentOverlay = null;
+    if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
+      setTimeout(() => {
+        chrome.runtime.sendMessage(
+          {
+            type: "CLICKED",
+            elementData: targetElementInfo,
+          },
+          (res) => {
+            if (res && res.status === "captured") {
+              if (currentOverlay) {
+                currentOverlay.remove();
+                currentOverlay = null;
+              }
+              targetElementInfo = null;
+            } else {
+              console.warn("캡처 실패:", res);
             }
-            targetElementInfo = null;
-          } else {
-            console.warn("캡처 실패:", res);
-          }
-        },
-      );
-    }, 100);
+          },
+        );
+      }, 100);
+    }
   }
 }
