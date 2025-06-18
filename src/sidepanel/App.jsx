@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import Login from "@/sidepanel/pages/Login";
+import LoginPopup from "@/sidepanel/pages/Login/LoginPopup";
 import MainPage from "@/sidepanel/pages/MainPage";
 import ProtectedRoute from "@/sidepanel/pages/ProtectedRoute";
 import Repository from "@/sidepanel/pages/Repository";
@@ -73,6 +74,10 @@ const App = () => {
       <Route
         path="/login"
         element={<Login setIsLoggedIn={setIsLoggedIn} />}
+      />
+      <Route
+        path="/login-popup"
+        element={<LoginPopup />}
       />
       <Route
         element={
