@@ -1,6 +1,15 @@
 if (!window.ezmanual_click_listener_injected) {
   window.ezmanual_click_listener_injected = true;
 
+  const MESSAGE_TYPES = {
+    START_CAPTURE: "START_CAPTURE",
+    STOP_CAPTURE: "STOP_CAPTURE",
+    CLEANUP_ALL: "CLEANUP_ALL",
+    SEND_COLOR: "SEND_COLOR",
+    CLICKED: "CLICKED",
+    SHOW_CAPTURE_MESSAGE: "SHOW_CAPTURE_MESSAGE",
+  };
+
   let currentOverlay = null;
   let targetElementInfo = null;
 
@@ -30,9 +39,9 @@ if (!window.ezmanual_click_listener_injected) {
   });
 
   chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === "SEND_COLOR") {
+    if (message.type === MESSAGE_TYPES.SEND_COLOR) {
       selectedColor = message.data;
-    } else if (message.type === "STOP_CAPTURE") {
+    } else if (message.type === MESSAGE_TYPES.STOP_CAPTURE) {
       chrome.storage.local.set({ isCapturing: false });
       window.removeEventListener("mousedown", handleClick);
 
@@ -41,7 +50,7 @@ if (!window.ezmanual_click_listener_injected) {
         currentOverlay = null;
       }
       targetElementInfo = null;
-    } else if (message.type === "START_CAPTURE") {
+    } else if (message.type === MESSAGE_TYPES.START_CAPTURE) {
       chrome.storage.local.set({ isCapturing: true });
       window.addEventListener("mousedown", handleClick);
     }
@@ -78,7 +87,7 @@ if (!window.ezmanual_click_listener_injected) {
       setTimeout(() => {
         chrome.runtime.sendMessage(
           {
-            type: "CLICKED",
+            type: MESSAGE_TYPES.CLICKED,
             elementData: targetElementInfo,
           },
           (res) => {
