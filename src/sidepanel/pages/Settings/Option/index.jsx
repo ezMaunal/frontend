@@ -1,6 +1,7 @@
 import "@/styles/styles.css";
 import { useState, useEffect } from "react";
 
+import { MESSAGE_TYPES } from "@/constants/chromeMessageType";
 import BackButton from "@/sidepanel/components/BackButton";
 
 const Option = () => {
@@ -22,7 +23,7 @@ const Option = () => {
 
   useEffect(() => {
     chrome.runtime.sendMessage({
-      type: "SEND_COLOR",
+      type: MESSAGE_TYPES.SEND_COLOR,
       data: squareColor,
     });
   }, [squareColor]);
