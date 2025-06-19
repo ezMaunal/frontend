@@ -13,8 +13,14 @@ if (!window.ezmanual_click_listener_injected) {
   let currentOverlay = null;
   let targetElementInfo = null;
 
-  let selectedColor = "#bf0000";
+  let selectedColor = "#ff0000";
   let isCapturing = false;
+
+  chrome.storage.local.get("selectedColor", (result) => {
+    if (result.selectedColor) {
+      selectedColor = result.selectedColor;
+    }
+  });
 
   chrome.storage.local.get("isCapturing", (result) => {
     if (result.isCapturing !== undefined) {
@@ -72,7 +78,7 @@ if (!window.ezmanual_click_listener_injected) {
     overlay.style.width = `${rect.width + 12}px`;
     overlay.style.height = `${rect.height + 12}px`;
     overlay.style.border =
-      selectedColor === undefined ? "5px solid #bf0000" : `5px solid ${selectedColor}`;
+      selectedColor === undefined ? "5px solid #ff0000" : `5px solid ${selectedColor}`;
     overlay.style.zIndex = "999999";
     overlay.style.pointerEvents = "none";
     document.body.appendChild(overlay);
