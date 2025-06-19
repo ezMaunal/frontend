@@ -6,6 +6,7 @@ import LoginPopup from "@/sidepanel/pages/Login/LoginPopup";
 import MainPage from "@/sidepanel/pages/MainPage";
 import ProtectedRoute from "@/sidepanel/pages/ProtectedRoute";
 import Repository from "@/sidepanel/pages/Repository";
+import ModifyingTaskboard from "@/sidepanel/pages/Repository/ModifyingTaskboard";
 import Settings from "@/sidepanel/pages/Settings";
 import DeleteAccount from "@/sidepanel/pages/Settings/DeleteAccount";
 import NoticeDeleteAccount from "@/sidepanel/pages/Settings/DeleteAccount/NoticeDeleteAccount";
@@ -116,6 +117,10 @@ const App = () => {
           element={<Option />}
         />
       </Route>
+      <Route
+        path="/repository/manual/:manualId"
+        element={<ModifyingTaskboard />}
+      />
     </Routes>
   );
 };

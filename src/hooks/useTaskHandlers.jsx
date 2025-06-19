@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
-import createManual from "@/api/createManual";
 import { MESSAGE_TYPES } from "@/constants/chromeMessageType";
 import { resetCapturedSteps, getCaptureStatus } from "@/utils/storage";
 
-const useTaskHandlers = ({ steps, setSteps, setIsCapturing, setIsLoading, setShowModal }) => {
+const useTaskHandlers = ({ setSteps, setIsCapturing }) => {
   const navigate = useNavigate();
   const goToMain = () => {
     navigate("/");
@@ -12,7 +11,7 @@ const useTaskHandlers = ({ steps, setSteps, setIsCapturing, setIsLoading, setSho
   const handleTitleChange = (index, newTitle) => {
     setSteps((prev) => {
       const updated = [...prev];
-      updated[index].elementData.textContent = newTitle;
+      updated[index].text = newTitle.trim();
 
       chrome.storage.local.set({ CapturedSteps: updated });
       return updated;
@@ -34,37 +33,13 @@ const useTaskHandlers = ({ steps, setSteps, setIsCapturing, setIsLoading, setSho
       return !prev;
     });
   };
-  const handleFinishClick = async () => {
-    const stepData = steps.map((step) => ({
-      text: step.elementData.textContent,
-      image: step.image,
-    }));
-    const body = {
-      steps: stepData,
-    };
 
-    setIsLoading(true);
-    try {
-      await createManual(body);
-      await chrome.storage.local.set({ isCapturing: false });
-
-      const status = await getCaptureStatus();
-      setIsCapturing(status);
-      resetCapturedSteps();
-      navigate("/repository");
-    } catch (error) {
-      console.error("매뉴얼 생성 에러:", error);
-      setShowModal(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
   const handleCleanupClick = async () => {
     chrome.runtime.sendMessage({ type: MESSAGE_TYPES.CLEANUP_ALL }, async () => {
       if (chrome.runtime.lastError) {
         console.error("CLEANUP_ALL 전송 오류:", chrome.runtime.lastError.message);
       } else {
-        console.log("📨 CLEANUP_ALL 메시지 전송됨");
+        console.log("CLEANUP_ALL 메시지 전송됨");
         await chrome.storage.local.set({ isCapturing: false });
 
         const status = await getCaptureStatus();
@@ -79,7 +54,6 @@ const useTaskHandlers = ({ steps, setSteps, setIsCapturing, setIsLoading, setSho
     handleTitleChange,
     handleDeleteStep,
     handlePauseClick,
-    handleFinishClick,
     handleCleanupClick,
   };
 };

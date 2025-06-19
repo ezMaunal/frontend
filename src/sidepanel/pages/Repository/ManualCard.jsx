@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import DeleteConfirmModal from "@/sidepanel/components/DeleteConfirmModal";
 import { formatToLocalDateTime } from "@/utils/dateUtil";
@@ -8,6 +9,12 @@ const ManualCard = ({ index, title, date, thumbnail, manualId, onDelete, onUpdat
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(title);
   const [showModal, setShowModal] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleModify = () => {
+    navigate(`/repository/manual/${manualId}`);
+  };
 
   const handleDeleteClick = () => {
     setShowModal(true);
@@ -76,7 +83,7 @@ const ManualCard = ({ index, title, date, thumbnail, manualId, onDelete, onUpdat
               <button className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100">공유</button>
               <button
                 className="w-full cursor-pointer px-3 py-2 text-left text-sm hover:bg-gray-100"
-                onClick={() => {}}
+                onClick={handleModify}
               >
                 수정
               </button>
