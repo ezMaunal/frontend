@@ -1,18 +1,26 @@
 if (!window.ezmanual_click_listener_injected) {
   window.ezmanual_click_listener_injected = true;
 
-let selectedColor = "#ff0000";
-let isCapturing = false;
+  const MESSAGE_TYPES = {
+    START_CAPTURE: "START_CAPTURE",
+    STOP_CAPTURE: "STOP_CAPTURE",
+    CLEANUP_ALL: "CLEANUP_ALL",
+    SEND_COLOR: "SEND_COLOR",
+    CLICKED: "CLICKED",
+    SHOW_CAPTURE_MESSAGE: "SHOW_CAPTURE_MESSAGE",
+  };
 
-chrome.storage.local.get("selectedColor", (result) => {
-  if (result.selectedColor) {
-    selectedColor = result.selectedColor;
-  }
-});
+  let currentOverlay = null;
+  let targetElementInfo = null;
 
-chrome.storage.local.get("isCapturing", (result) => {
-  if (result.isCapturing !== undefined) {
-    isCapturing = result.isCapturing;
+  let selectedColor = "#ff0000";
+  let isCapturing = false;
+
+  chrome.storage.local.get("selectedColor", (result) => {
+    if (result.selectedColor) {
+      selectedColor = result.selectedColor;
+    }
+  });
 
   chrome.storage.local.get("isCapturing", (result) => {
     if (result.isCapturing !== undefined) {
@@ -62,19 +70,19 @@ chrome.storage.local.get("isCapturing", (result) => {
 
     if (currentOverlay) currentOverlay.remove();
 
-  const overlay = document.createElement("div");
-  overlay.id = "red-outline-box";
-  overlay.style.position = "absolute";
-  overlay.style.top = `${window.scrollY + rect.top - 6}px`;
-  overlay.style.left = `${window.scrollX + rect.left - 6}px`;
-  overlay.style.width = `${rect.width + 12}px`;
-  overlay.style.height = `${rect.height + 12}px`;
-  overlay.style.border =
-    selectedColor === undefined ? "5px solid #ff0000" : `5px solid ${selectedColor}`;
-  overlay.style.zIndex = "999999";
-  overlay.style.pointerEvents = "none";
-  document.body.appendChild(overlay);
-  currentOverlay = overlay;
+    const overlay = document.createElement("div");
+    overlay.id = "red-outline-box";
+    overlay.style.position = "absolute";
+    overlay.style.top = `${window.scrollY + rect.top - 6}px`;
+    overlay.style.left = `${window.scrollX + rect.left - 6}px`;
+    overlay.style.width = `${rect.width + 12}px`;
+    overlay.style.height = `${rect.height + 12}px`;
+    overlay.style.border =
+      selectedColor === undefined ? "5px solid #ff0000" : `5px solid ${selectedColor}`;
+    overlay.style.zIndex = "999999";
+    overlay.style.pointerEvents = "none";
+    document.body.appendChild(overlay);
+    currentOverlay = overlay;
 
     targetElementInfo = {
       tagName: target.tagName,
